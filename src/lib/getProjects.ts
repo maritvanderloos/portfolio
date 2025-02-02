@@ -8,8 +8,8 @@ export interface ProjectData {
   slug: string;             // The folder name
   title: string;            // We’ll use folder name as title
   descriptionHtml: string;  // Contents from description.md
-  cover: () => Promise<ImageMetadata>;            // Path to the cover image
-  images: (() => Promise<ImageMetadata>)[];         // Array of other images
+  cover: () => Promise<{ default: ImageMetadata }>;            // Path to the cover image
+  images: (() => Promise<{ default: ImageMetadata }>)[];         // Array of other images
   year: string;
 }
 

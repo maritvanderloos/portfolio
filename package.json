@@ -9,11 +9,14 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/svelte": "^7.0.4",
     "@tailwindcss/vite": "^4.0.3",
     "astro": "^5.2.3",
     "gray-matter": "^4.0.3",
     "marked": "^15.0.6",
-    "tailwindcss": "^4.0.3"
+    "svelte": "^5.19.6",
+    "tailwindcss": "^4.0.3",
+    "typescript": "^5.7.3"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16"

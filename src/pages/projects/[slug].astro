@@ -1,4 +1,5 @@
 ---
+import FullScreenable from "../../components/FullScreenable.svelte";
 import { Image } from "astro:assets";
 import { getProjects } from "../../lib/getProjects";
 export function getStaticPaths() {
@@ -33,13 +34,24 @@ if (!project) {
 
   <div class="flex flex-wrap gap-4">
     {
-      project.images.map((img) => (
-        <Image
-          src={img()}
-          alt="Additional project image"
-          width={300}
-          height={300}
-        />
+      project.images.map(async (img) => (
+        <FullScreenable client:load src={await img()}>
+          <div slot="image">
+
+          <Image
+            src={img()}
+            alt="Additional project image"
+            width={300}
+            height={300}
+            />
+          </div>
+          <div slot="full-screen">
+            <Image
+              src={img()}
+              alt="Additional project image"
+            />
+          </div>
+        </FullScreenable>
       ))
     }
     <!-- {
