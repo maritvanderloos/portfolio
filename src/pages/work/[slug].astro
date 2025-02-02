@@ -1,6 +1,5 @@
 ---
 import {
-  projectData,
   categoryData,
   getCategoryBySlug,
 } from "../../lib/getProjects";
@@ -40,7 +39,7 @@ if (!projects) {
   <div class="flex flex-wrap gap-4">
     <ul>
       {
-        projectData.map((project) => (
+        projects.map((project) => (
           <li class="mb-8">
             <a
               href={`${import.meta.env.BASE_URL}/projects/${project.slug}`}

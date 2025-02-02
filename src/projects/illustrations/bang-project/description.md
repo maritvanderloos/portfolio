@@ -1,11 +1,8 @@
 ---
 title: Bang in het donker
-year: 2024
+year: 2023
 ---
 
-### Hello!
-> Haha this is bing bong
-
-Grrrrrr `grrrr`
+### Bang in het donker
 
 

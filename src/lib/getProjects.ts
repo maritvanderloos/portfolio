@@ -74,5 +74,6 @@ export function getCategoryBySlug(slug: string): CategoryData | undefined {
 }
 
 export function getProjectsByCategory(categorySlug: string): ProjectData[] {
+  console.log('gettingproject by slug', categorySlug)
   return projectData.filter((project) => project.category.slug === categorySlug);
 }
