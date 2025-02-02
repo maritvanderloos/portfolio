@@ -1,0 +1,45 @@
+---
+import { getProjects } from '../../lib/getProjects';
+export function getStaticPaths() {
+  const projects = getProjects();
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+  }));
+}
+
+import { getProjectBySlug, type ProjectData } from '../../lib/getProjects';
+
+const { slug } = Astro.params;
+const project: ProjectData = getProjectBySlug(slug)!;
+console.debug("Project is", project)
+
+if (!project) {
+  console.error("Project not found!", slug)
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{project.title}</title>
+  </head>
+  <body>
+    <h1>{project.title}</h1>
+    <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
+    <div dangerouslySetInnerHTML={project.descriptionHtml} />
+
+    <h2>Gallery</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+      {project.images.map((img) => (
+        <img
+          src={img}
+          alt="Additional project image"
+          style="max-width: 300px;"
+        />
+      ))}
+    </div>
+
+    <p><a href="/">← Back to home</a></p>
+  </body>
+</html>

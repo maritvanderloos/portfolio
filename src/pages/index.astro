@@ -1,11 +1,32 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { getProjects, ProjectData } from '../lib/getProjects';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const projects: ProjectData[] = getProjects();
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Art Projects</title>
+  </head>
+  <body>
+    <h1>My Art Projects</h1>
+    <ul style="list-style: none; padding: 0;">
+      {projects.map((project) => (
+        <li style="margin-bottom: 2rem;">
+          <a href={`/projects/${project.slug}`} style="text-decoration: none; color: inherit;">
+            <div>
+              <img
+                src={project.cover}
+                alt={project.title}
+                style="max-width: 300px; display: block;"
+              />
+            </div>
+            <h2>{project.title}</h2>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </body>
+</html>
