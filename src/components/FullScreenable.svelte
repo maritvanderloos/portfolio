@@ -2,14 +2,6 @@
     import { onDestroy, onMount, type Snippet } from "svelte";
     import { fade, fly, scale } from "svelte/transition";
 
-    // let {
-    //     children,
-    //     src,
-    // }: {
-    //     children: Snippet;
-    //     src: ImageMetadata;
-    // } = $props();
-
     let container: HTMLDivElement;
     let isFullScreen = $state(false);
     let zoom = $state(1);
@@ -105,8 +97,8 @@
             <slot name="full-screen" />
             {#if zoom == 1}
                 <p
-                    transition:fly={{ y: 100, duration: 300, delay: 500 }}
-                    class="absolute left-0 text-gray-500 text-sm"
+                    transition:fly={{ y: 100, duration: 300, delay: 50 }}
+                    class="absolute left-0 text-gray-400 text-sm"
                     style="bottom: -50px; left: 50%; transform: translateX(-50%);"
                 >
                     You can scroll to zoom in and out

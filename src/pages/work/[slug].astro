@@ -1,0 +1,78 @@
+---
+import {
+  projectData,
+  categoryData,
+  getCategoryBySlug,
+} from "../../lib/getProjects";
+import { Image } from "astro:assets";
+
+export function getStaticPaths() {
+  return categoryData.map((category) => ({
+    params: { slug: category.slug },
+  }));
+}
+
+import { getProjectsByCategory, type ProjectData } from "../../lib/getProjects";
+import Layout from "../../layouts/Layout.astro";
+
+const { slug } = Astro.params;
+const category = getCategoryBySlug(slug)!;
+const projects: ProjectData[] = getProjectsByCategory(slug)!;
+
+if (!projects) {
+  console.error("Project not found!", slug);
+}
+
+// const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
+// const projectImages = Object.entries(allImages).filter(([key, value]) => key.includes(slug));
+---
+
+<Layout>
+  <p class="mb-5">
+    <a href="/portfolio" class="">←</a>
+    <span class="">
+      <span class="">Work</span>
+      <span class="">/</span>
+      <span class="">{category.title}</span>
+    </span>
+  </p>
+
+  <div class="flex flex-wrap gap-4">
+    <ul>
+      {
+        projectData.map((project) => (
+          <li class="mb-8">
+            <a
+              href={`${import.meta.env.BASE_URL}/projects/${project.slug}`}
+              class="text-decoration-none text-inherit"
+            >
+              <div class="mb-4">
+                <Image
+                  src={project.covers[0]()}
+                  alt={project.title}
+                  width={300}
+                  height={300}
+                />
+              </div>
+
+              <div class="flex flex-col">
+                <p class="text-lg text-gray-700">{project.title}</p>
+                <p class="text-sm text-gray-700">{project.year}</p>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <!-- {
+      project.images.map((img) => (
+        <Image
+          src={img}
+          alt="Additional project image"
+          width={300}
+          height={300}
+        />
+      ))
+    } -->
+  </div>
+</Layout>

@@ -1,38 +1,65 @@
 ---
+import { projectData, categoryData } from "../lib/getProjects";
+
 const currentPath = Astro.url;
+const url = (href: string) => new URL(import.meta.env.BASE_URL + href, Astro.url.origin);
 const navLinks = [
-    { href: '', label: 'Home' },
-    { href: '/about/', label: 'About Me' },
-    { href: '/contact/', label: 'Contact' },
-    { href: '/work/', label: 'Work' }
-].map(link => ({
-    url: new URL(import.meta.env.BASE_URL + link.href, Astro.url.origin),
-    label: link.label,
-}));
+    { url: url(""), label: "Home" },
+    { url: url("/about/"), label: "About Me" },
+    { url: url("/contact/"), label: "Contact" },
+    {
+        // url: url("/work/"),
+        label: "Work",
+        sublinks: categoryData.map((category) => ({
+            url: url(`/work/${category.slug}`),
+            label: category.title,
+        })),
+    },
+]
 
 const isRouteActive = (url: URL) => {
     // console.debug("Current path is", currentPath, "and url is", url);
     return url.href === currentPath.href;
-}
+};
 ---
 
-<aside class="h-auto md:h-screen w-full md:w-64 flex flex-col justify-between bg-white p-6">
+<aside
+    class="h-auto md:h-screen w-full md:w-64 flex flex-col justify-between bg-white p-6"
+>
     <div class="space-y-6">
         <!-- Logo -->
-        <div class="text-2xl font-bold">
-            Marit van der Loos
-        </div>
+        <div class="text-2xl font-bold">Marit van der Loos</div>
 
         <!-- Navigation Links -->
         <nav class="space-y-4">
-            {navLinks.map(link => (
-                <a 
-                    href={link.url.pathname} 
-                    class={`block hover:text-blue-600 transition-colors ${isRouteActive(link.url) ? 'text-blue-600' : ''}`}
-                >
-                    {link.label}
-                </a>
-            ))}
+            {
+                navLinks.map((link) => (
+                    <div>
+                        {link.url ? (
+                            <a
+                                href={link.url.pathname}
+                                class={`block hover:text-blue-600 transition-colors ${isRouteActive(link.url) ? "text-blue-600" : ""}`}
+                        >
+                                {link.label}
+                            </a>
+                        ) : (
+                            <div class="select-none">{link.label}</div>
+                        )}
+
+                        {link.sublinks && (
+                            <ul class="space-y-2 pl-4">
+                                {link.sublinks.map((sublink) => (
+                                    <li>
+                                        <a href={sublink.url.pathname} class="text-gray-800 hover:text-blue-600 transition-colors">
+                                            {sublink.label}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                ))
+            }
         </nav>
     </div>
 

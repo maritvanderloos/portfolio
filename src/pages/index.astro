@@ -1,10 +1,9 @@
 ---
 import "../styles/global.css";
-import { getProjects, type ProjectData } from "../lib/getProjects";
+import { projectData } from "../lib/getProjects";
 import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 
-const projects: ProjectData[] = getProjects();
 // const imagePrefix = "/src/projects";
 // const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
 // const getCoverImage = (slug: string) => {
@@ -22,7 +21,7 @@ const projects: ProjectData[] = getProjects();
 <Layout>
   <ul>
     {
-      projects.map((project) => (
+      projectData.map((project) => (
         <li class="mb-8">
           <a
             href={`${import.meta.env.BASE_URL}/projects/${project.slug}`}
@@ -30,7 +29,7 @@ const projects: ProjectData[] = getProjects();
           >
             <div class="mb-4">
               <Image
-                src={project.cover()}
+                src={project.covers[0]()}
                 alt={project.title}
                 width={300}
                 height={300}
