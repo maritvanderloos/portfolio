@@ -1,6 +1,6 @@
 ---
-        import { Image } from "astro:assets"
-import { getProjects } from '../../lib/getProjects';
+import { Image } from "astro:assets";
+import { getProjects } from "../../lib/getProjects";
 export function getStaticPaths() {
   const projects = getProjects();
   return projects.map((project) => ({
@@ -8,40 +8,38 @@ export function getStaticPaths() {
   }));
 }
 
-import { getProjectBySlug, type ProjectData } from '../../lib/getProjects';
+import { getProjectBySlug, type ProjectData } from "../../lib/getProjects";
+import Layout from "../../layouts/Layout.astro";
 
 const { slug } = Astro.params;
 const project: ProjectData = getProjectBySlug(slug)!;
-console.debug("Project is", project)
+console.debug("Project is", project);
 
 if (!project) {
-  console.error("Project not found!", slug)
+  console.error("Project not found!", slug);
 }
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>{project.title}</title>
-  </head>
-  <body>
-    <h1>{project.title}</h1>
-    <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
+<Layout>
+  <div class="prose">
+
+  <h1>{project.title}</h1>
+  <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
     <div set:html={project.descriptionHtml} />
+  </div>
+</Layout>
+<h2>Gallery</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+  {
+    project.images.map((img) => (
+      <Image
+        src={img}
+        alt="Additional project image"
+        width={300}
+        height={300}
+      />
+    ))
+  }
+</div>
 
-    <h2>Gallery</h2>
-    <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
-      {project.images.map((img) => (
-        <Image
-          src={img}
-          alt="Additional project image"
-          width={300}
-          height={300}
-        />
-      ))}
-    </div>
-
-    <p><a href="/portfolio">← Back to home</a></p>
-  </body>
-</html>
+<p><a href="/portfolio">← Back to home</a></p>

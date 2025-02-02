@@ -29,7 +29,7 @@ export function getProjects(): ProjectData[] {
     const possibleCoverNames = fs.readdirSync(projectPath)
       .filter((file) => file.startsWith('cover.'));
     const coverFile = possibleCoverNames.length
-      ? path.join('/projects', dir, possibleCoverNames[0])
+      ? path.join(import.meta.env.BASE_URL, 'projects', dir, possibleCoverNames[0])
       : '/placeholder-cover.jpg';  // fallback if no cover is found
 
     // 2. Read and parse `description.md`
@@ -43,7 +43,7 @@ export function getProjects(): ProjectData[] {
         file !== 'description.md' &&
         !file.startsWith('cover.')
       )
-      .map((file) => path.join('/projects', dir, file));
+      .map((file) => path.join(import.meta.env.BASE_URL, 'projects', dir, file));
 
     return {
       slug: dir,
