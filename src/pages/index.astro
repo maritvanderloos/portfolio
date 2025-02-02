@@ -1,5 +1,6 @@
 ---
-import { getProjects, ProjectData } from '../lib/getProjects';
+import { getProjects, type ProjectData } from '../lib/getProjects';
+import { Image } from "astro:assets"
 
 const projects: ProjectData[] = getProjects();
 ---
@@ -15,12 +16,13 @@ const projects: ProjectData[] = getProjects();
     <ul style="list-style: none; padding: 0;">
       {projects.map((project) => (
         <li style="margin-bottom: 2rem;">
-          <a href={`/projects/${project.slug}`} style="text-decoration: none; color: inherit;">
+          <a href={`/portfolio/projects/${project.slug}`} style="text-decoration: none; color: inherit;">
             <div>
-              <img
+              <Image
                 src={project.cover}
                 alt={project.title}
-                style="max-width: 300px; display: block;"
+                width={300}
+                height={300}
               />
             </div>
             <h2>{project.title}</h2>

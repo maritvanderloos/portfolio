@@ -1,4 +1,5 @@
 ---
+        import { Image } from "astro:assets"
 import { getProjects } from '../../lib/getProjects';
 export function getStaticPaths() {
   const projects = getProjects();
@@ -27,19 +28,20 @@ if (!project) {
   <body>
     <h1>{project.title}</h1>
     <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
-    <div dangerouslySetInnerHTML={project.descriptionHtml} />
+    <div set:html={project.descriptionHtml} />
 
     <h2>Gallery</h2>
     <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
       {project.images.map((img) => (
-        <img
+        <Image
           src={img}
           alt="Additional project image"
-          style="max-width: 300px;"
+          width={300}
+          height={300}
         />
       ))}
     </div>
 
-    <p><a href="/">← Back to home</a></p>
+    <p><a href="/portfolio">← Back to home</a></p>
   </body>
 </html>
