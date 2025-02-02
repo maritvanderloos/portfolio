@@ -1,5 +1,7 @@
 import fs from 'fs';
+import type { ImageMetadata } from 'astro';
 import path from 'path';
+import matter from 'gray-matter';
 import { marked } from 'marked';
 
 export interface ProjectData {
@@ -8,10 +10,10 @@ export interface ProjectData {
   descriptionHtml: string;  // Contents from description.md
   cover: string;            // Path to the cover image
   images: string[];         // Array of other images
+  year: string;
 }
 
-// Adjust if your 'projects' folder is located elsewhere
-const projectsDir = path.join(process.cwd(), 'projects');
+const projectsDir = path.join(process.cwd(), 'src', 'projects');
 
 export function getProjects(): ProjectData[] {
   console.debug('Getting projects');
@@ -31,11 +33,24 @@ export function getProjects(): ProjectData[] {
     const coverFile = possibleCoverNames.length
       ? path.join(import.meta.env.BASE_URL, 'projects', dir, possibleCoverNames[0])
       : '/placeholder-cover.jpg';  // fallback if no cover is found
+    // const coverFile = path.join(projectPath, 'cover.jpg');
+    // console.debug("Cover file is", coverFile, import.meta.glob(coverFile));
+    // const projectPath = path.join(projectPath, '**/*.{jpg,jpeg,png,gif,webp}');
+    // const _images = import.meta.glob<{default: ImageMetadata}>(path.join(projectPath, '/*.{jpg,jpeg,png,gif,webp}'));
+    // console.debug("Images are", _images);
+    // import(coverFile).then((image) => {
+    //   console.debug("Image is", image);
+    // });
+
 
     // 2. Read and parse `description.md`
     const descriptionPath = path.join(projectPath, 'description.md');
     const descriptionMarkdown = fs.readFileSync(descriptionPath, 'utf-8');
-    const descriptionHtml = marked.parse(descriptionMarkdown);
+    // const descriptionHtml = marked.parse(descriptionMarkdown);
+
+    const matterResult = matter(descriptionMarkdown);
+    const { data, content } = matterResult;
+    // console.debug("Data is", data, "and content is", content);
 
     // 3. Gather all images that aren’t `cover.*` or `description.md`
     const images = fs.readdirSync(projectPath)
@@ -45,12 +60,16 @@ export function getProjects(): ProjectData[] {
       )
       .map((file) => path.join(import.meta.env.BASE_URL, 'projects', dir, file));
 
+    // console.debug("Images are", images);
+
     return {
       slug: dir,
-      title: dir,
-      descriptionHtml,
-      cover: coverFile,
-      images
+      title: data.title,
+      year: data.year,
+      description: content,
+      descriptionHtml: marked.parse(content),
+      // cover: coverFile,
+      // images,
     };
   });
 }

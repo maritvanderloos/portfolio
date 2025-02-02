@@ -18,28 +18,40 @@ console.debug("Project is", project);
 if (!project) {
   console.error("Project not found!", slug);
 }
+
+const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
+const projectImages = Object.entries(allImages).filter(([key, value]) => key.includes(slug));
 ---
 
 <Layout>
   <div class="prose">
-
-  <h1>{project.title}</h1>
-  <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
+    <p><a href="/portfolio">← Back to home</a></p>
+    <h1>{project.title}</h1>
+    <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
     <div set:html={project.descriptionHtml} />
   </div>
-</Layout>
-<h2>Gallery</h2>
-<div style="display: flex; flex-wrap: wrap; gap: 1rem;">
-  {
-    project.images.map((img) => (
-      <Image
-        src={img}
-        alt="Additional project image"
-        width={300}
-        height={300}
-      />
-    ))
-  }
-</div>
 
-<p><a href="/portfolio">← Back to home</a></p>
+  <div class="flex flex-wrap gap-4">
+    {
+      projectImages.map(([key, value]) => (
+        <Image
+          src={value()}
+          alt={key}
+          width={300}
+          height={300}
+        />
+      ))
+    }
+    <!-- {
+      project.images.map((img) => (
+        <Image
+          src={img}
+          alt="Additional project image"
+          width={300}
+          height={300}
+        />
+      ))
+    } -->
+  </div>
+
+</Layout>
