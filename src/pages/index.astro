@@ -5,17 +5,18 @@ import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 
 const projects: ProjectData[] = getProjects();
-const imagePrefix = "/src/projects";
-const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
-const getCoverImage = (slug: string) => {
-  const coverKey = `${imagePrefix}/${slug}/cover`;
-  const entry = Object.entries(allImages).find(([key, value]) => key.includes(coverKey));
-  if (!entry) {
-    console.error("Cover image not found for", slug);
-  }
-  return entry![1]();
-}
-console.debug("All images are", allImages);
+// const imagePrefix = "/src/projects";
+// const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
+// const getCoverImage = (slug: string) => {
+//   const coverKey = `${imagePrefix}/${slug}/cover`;
+//   const entry = Object.entries(allImages).find(([key, value]) => key.includes(coverKey));
+//   if (!entry) {
+//     console.error("Cover image not found for", slug);
+//   }
+//   return entry![1]();
+// }
+// console.debug("All images are", allImages);
+
 ---
 
 <Layout>
@@ -29,7 +30,7 @@ console.debug("All images are", allImages);
           >
             <div class="mb-4">
               <Image
-                src={getCoverImage(project.slug)}
+                src={project.cover()}
                 alt={project.title}
                 width={300}
                 height={300}

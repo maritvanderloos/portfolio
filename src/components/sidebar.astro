@@ -1,14 +1,19 @@
 ---
-const currentPath = Astro.url.pathname;
+const currentPath = Astro.url;
 const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About Me' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/work', label: 'Work' }
+    { href: '', label: 'Home' },
+    { href: '/about/', label: 'About Me' },
+    { href: '/contact/', label: 'Contact' },
+    { href: '/work/', label: 'Work' }
 ].map(link => ({
-    ...link,
-    href: `${import.meta.env.BASE_URL}${link.href}`
+    url: new URL(import.meta.env.BASE_URL + link.href, Astro.url.origin),
+    label: link.label,
 }));
+
+const isRouteActive = (url: URL) => {
+    // console.debug("Current path is", currentPath, "and url is", url);
+    return url.href === currentPath.href;
+}
 ---
 
 <aside class="h-auto md:h-screen w-full md:w-64 flex flex-col justify-between bg-white p-6">
@@ -22,8 +27,8 @@ const navLinks = [
         <nav class="space-y-4">
             {navLinks.map(link => (
                 <a 
-                    href={link.href} 
-                    class={`block hover:text-blue-600 transition-colors ${currentPath == link.href ? 'text-blue-600' : ''}`}
+                    href={link.url.pathname} 
+                    class={`block hover:text-blue-600 transition-colors ${isRouteActive(link.url) ? 'text-blue-600' : ''}`}
                 >
                     {link.label}
                 </a>

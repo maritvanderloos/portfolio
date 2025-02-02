@@ -19,8 +19,8 @@ if (!project) {
   console.error("Project not found!", slug);
 }
 
-const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
-const projectImages = Object.entries(allImages).filter(([key, value]) => key.includes(slug));
+// const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
+// const projectImages = Object.entries(allImages).filter(([key, value]) => key.includes(slug));
 ---
 
 <Layout>
@@ -33,10 +33,10 @@ const projectImages = Object.entries(allImages).filter(([key, value]) => key.inc
 
   <div class="flex flex-wrap gap-4">
     {
-      projectImages.map(([key, value]) => (
+      project.images.map((img) => (
         <Image
-          src={value()}
-          alt={key}
+          src={img()}
+          alt="Additional project image"
           width={300}
           height={300}
         />
