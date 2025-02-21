@@ -40,7 +40,7 @@ if (!projects) {
     <ul>
       {
         projects.map((project) => (
-          <li class="mb-8">
+          <li class="mb-8 flex flex-col items-center mb-24 ">
             <a
               href={`${import.meta.env.BASE_URL}/projects/${project.slug}`}
               class="text-decoration-none text-inherit"
@@ -49,12 +49,11 @@ if (!projects) {
                 <Image
                   src={project.covers[0]?.() || 'https://placecats.com/300/200'}
                   alt={project.title}
-                  width={300}
-                  height={300}
+                  class="max-h-[80vh] w-full object-contain"
                 />
               </div>
 
-              <div class="flex flex-col">
+              <div class="flex flex-col text-center">
                 <p class="text-lg text-gray-700">{project.title}</p>
                 <p class="text-sm text-gray-700">{project.year}</p>
               </div>

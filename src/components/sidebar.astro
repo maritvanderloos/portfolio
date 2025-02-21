@@ -24,14 +24,14 @@ const isRouteActive = (url: URL) => {
 ---
 
 <aside
-    class="h-auto md:h-screen w-full md:w-64 flex flex-col justify-between bg-white p-6"
+    class="h-auto md:h-screen w-full md:w-52 flex flex-col justify-between bg-white py-6 px-4 border-r border-gray-100 opacity-60 hover:opacity-100 transition-all"
 >
     <div class="space-y-6">
         <!-- Logo -->
-        <div class="text-2xl font-bold">Marit van der Loos</div>
+        <div class="text-xl font-bold font-serif"><span class="inline-block"> Marit </span> <span class=""> van der Loos </span></div>
 
         <!-- Navigation Links -->
-        <nav class="space-y-4">
+        <nav class="space-y-4 mt-auto text-sm">
             {
                 navLinks.map((link) => (
                     <div>
@@ -43,11 +43,11 @@ const isRouteActive = (url: URL) => {
                                 {link.label}
                             </a>
                         ) : (
-                            <div class="select-none">{link.label}</div>
+                            <div class="select-none text-gray-500">{link.label}</div>
                         )}
 
                         {link.sublinks && (
-                            <ul class="space-y-2 pl-4">
+                            <ul class="space-y-2 mt-1 pl-2">
                                 {link.sublinks.map((sublink) => (
                                     <li>
                                         <a href={sublink.url.pathname} class="text-gray-800 hover:text-blue-600 transition-colors">
@@ -64,7 +64,7 @@ const isRouteActive = (url: URL) => {
     </div>
 
     <!-- Footer -->
-    <footer class="hidden md:block text-sm text-gray-500">
+    <footer class="hidden md:block text-gray-500 text-xs">
         <p>© {new Date().getFullYear()} Marit van der Loos</p>
     </footer>
 </aside>
