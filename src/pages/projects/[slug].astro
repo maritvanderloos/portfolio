@@ -1,7 +1,9 @@
 ---
 import FullScreenable from "../../components/FullScreenable.svelte";
+import MasonryImageGrid from "../../components/MasonryImageGrid.svelte";
 import { Image } from "astro:assets";
 import { projectData } from "../../lib/getProjects";
+
 export function getStaticPaths() {
   return projectData.map((project) => ({
     params: { slug: project.slug },
@@ -30,13 +32,14 @@ if (!project) {
     <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
     <div set:html={project.descriptionHtml} />
   </div>
+  <div class="w-full h-full">
 
-  <div class="flex flex-wrap gap-4">
+  <MasonryImageGrid client:load>
     {
       project.images.map(async (img) => (
+      <div class="w-[250px]" data-masonry-item>
         <FullScreenable client:load src={await img()}>
           <div slot="image">
-
           <Image
             src={img()}
             alt="Additional project image"
@@ -51,18 +54,9 @@ if (!project) {
             />
           </div>
         </FullScreenable>
+        </div>
       ))
     }
-    <!-- {
-      project.images.map((img) => (
-        <Image
-          src={img}
-          alt="Additional project image"
-          width={300}
-          height={300}
-        />
-      ))
-    } -->
-  </div>
-
+    </MasonryImageGrid>
+</div>
 </Layout>

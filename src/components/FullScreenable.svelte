@@ -87,7 +87,7 @@
         </button>
         <div class="absolute inset-0 flex justify-center items-center">
             <div
-                class="w-12 h-12 border-4 border-t-transparent border-gray-500 rounded-full animate-spin"
+                class="w-8 h-8 border-4 border-t-transparent border-gray-500 rounded-full animate-spin"
             ></div>
         </div>
         <div
@@ -95,7 +95,7 @@
             style="transform: scale({zoom}); transform-origin: {zoomOriginX}% {zoomOriginY}%"
         >
             <slot name="full-screen" />
-            {#if zoom == 1}
+            <!-- {#if zoom == 1 && !loading}
                 <p
                     transition:fly={{ y: 100, duration: 300, delay: 50 }}
                     class="absolute left-0 text-gray-400 text-sm"
@@ -103,7 +103,7 @@
                 >
                     You can scroll to zoom in and out
                 </p>
-            {/if}
+            {/if} -->
         </div>
     </div>
 {/if}
