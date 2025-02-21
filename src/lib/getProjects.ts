@@ -55,7 +55,7 @@ export const projectData: ProjectData[] = await Promise.all(Object.entries(allPr
     title: data.frontmatter.title,
     year: data.frontmatter.year,
     category: categoryData.find((category) => category.slug === categorySlug)!,
-    descriptionHtml: await marked.parse(data.rawContent().trim()),
+    descriptionHtml: await marked.parse(data.rawContent().replaceAll("", "").trim()),
     images,
     covers,
   };

@@ -39,12 +39,12 @@ await Promise.all(matches.map(async (match) => {
     project.descriptionHtml = project.descriptionHtml.replace(match, `src="${(await image()).default.src}"`);
   }
 }));
-console.log({ matches, images: project.images })
+// console.log({ matches, images: project.images })
 ---
 
 <Layout>
-  <div class="prose">
-    <p><a href="/portfolio">← Back to home</a></p>
+  <div class="prose max-w-[80ch]">
+    <!-- <p><a href="/portfolio" class="no-underline">← Back</a></p> -->
     <span>{project.category.title} - {project.year}</span>
     <h1 class="font-serif text-5xl">{project.title}</h1>
     <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->

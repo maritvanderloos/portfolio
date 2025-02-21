@@ -1,15 +1,40 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Register your custom font family and tell the browser where to find it. */
+/* @font-face {
+    font-family: 'Playfair Display';
+    src: url('/fonts/PlayfairDisplay-VariableFont_wght.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+} */
+
 @theme {
     --font-serif: 'Playfair Display', serif;
 }
 
-/* Register your custom font family and tell the browser where to find it. */
-@font-face {
-  font-family: 'Playfair Display';
-  src: url('/fonts/PlayfairDisplay-VariableFont_wght.ttf') format('ttf');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+h1,
+h2,
+h3 {
+    font-optical-sizing: auto;
+    font-style: italic;
+    font-weight: 900 !important;
+}
+
+/* h1 {
+    font-family: var(--font-serif);
+} */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+pre {
+    background-color: transparent;
+    color: black;
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 400;
+    font-style: italic;
+    margin: 0;
+
 }

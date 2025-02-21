@@ -2,10 +2,12 @@
 title: Bang in het donker
 year: 2023
 ---
+
 Story I wrote, illustrated, printed and bound about street intimidation and feeling unsafe at night. In the story, the protagonist wishes she had a big dog to protect her, the dog being a metaphor for the feeling of safety and security.
 I made this zine during my study Illustration at Hogeschool voor de Kunsten Utrecht. Through an iterative process of writing lessons, feedback from teachers and students and revisions, I was able to make my own 12-page book from scratch.
 
 Text:
+```
 Bang in het donker
 Ik wou dat ik een grote enge hond had
 Die tijdens het uitgaan opgevouwen in mijn tas past
@@ -18,9 +20,11 @@ Die de achterdeur voor me op slot doet
 Die zich als ik slaap op de bank vlijt
 
 En die alleen mannen bijt
-
+```
 
 English translation of the text:
+
+```
 Afraid of the dark
 I wish I had a big, scary dog
 One that would fit into my bag whenever I go out
@@ -33,6 +37,8 @@ Who locks the back door behind me
 Who curls up on the couch as I sleep
 
 And who only bites men
+```
 
-Medium: Indian ink and water on aquarel paper
-Size: 18 * 26 cm
+**Medium**: Indian ink and water on aquarel paper
+<br>
+**Size**: 18 * 26 cm

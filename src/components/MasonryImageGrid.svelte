@@ -16,7 +16,7 @@
             // find [data-masonry-item]
             tick().then(() => {
                 const items = wrapper.querySelectorAll("[data-masonry-item]");
-                console.log("found items", items);
+                // console.log("found items", items);
                 if (!items)
                     throw new Error("MasonryImageGrid: container not found");
 
