@@ -34,3 +34,5 @@ Who curls up on the couch as I sleep
 
 And who only bites men
 
+Medium: Indian ink and water on aquarel paper
+Size: 18 * 26 cm

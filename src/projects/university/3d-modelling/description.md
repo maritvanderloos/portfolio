@@ -1,6 +1,6 @@
 ---
 title: 3D Modelling
-year: 2025
+year: 2024
 ---
 In a course on interactive visualization, I learned how to use Blender and Unity software for 3D modeling, animation and integrating these 3D assets into a game engine.
 

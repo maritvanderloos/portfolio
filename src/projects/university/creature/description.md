@@ -1,6 +1,6 @@
 ---
 title: Creature
-year: 2025
+year: 2023
 ---
 One of my first programming projects was creating this animal-like creature. It was made in Processing, a Java-based language designed for visual arts and interactive media. I built the creature entirely out of geometric shapes and lines, drawing inspiration from a riso-printed drawing I had made earlier.
 
