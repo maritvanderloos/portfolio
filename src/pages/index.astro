@@ -15,7 +15,6 @@ import Layout from "../layouts/Layout.astro";
 //   return entry![1]();
 // }
 // console.debug("All images are", allImages);
-
 ---
 
 <Layout>
@@ -29,7 +28,7 @@ import Layout from "../layouts/Layout.astro";
           >
             <div class="mb-4">
               <Image
-                src={project.covers[0]()}
+                src={project.covers[0]?.() || "https://placecats.com/300/200"}
                 alt={project.title}
                 width={300}
                 height={300}

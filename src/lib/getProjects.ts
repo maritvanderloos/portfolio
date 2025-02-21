@@ -24,7 +24,7 @@ export type ProjectData = {
 } & ProjectDataFrontmatter;
 
 // const projectsDir = path.join(process.cwd(), 'src', 'projects');
-const allImages = import.meta.glob<{ default: ImageMetadata }>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
+const allImages = import.meta.glob<{ default: ImageMetadata }>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp,JPG,JPEG}`);
 const allProjects = import.meta.glob(`/src/projects/**/description.md`);
 const allCategories = import.meta.glob(`/src/projects/**/category.md`);
 
