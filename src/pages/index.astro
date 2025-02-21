@@ -3,25 +3,13 @@ import "../styles/global.css";
 import { projectData } from "../lib/getProjects";
 import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
-
-// const imagePrefix = "/src/projects";
-// const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
-// const getCoverImage = (slug: string) => {
-//   const coverKey = `${imagePrefix}/${slug}/cover`;
-//   const entry = Object.entries(allImages).find(([key, value]) => key.includes(coverKey));
-//   if (!entry) {
-//     console.error("Cover image not found for", slug);
-//   }
-//   return entry![1]();
-// }
-// console.debug("All images are", allImages);
 ---
 
 <Layout>
-  <ul>
+  <div class="columns-1 md:columns-2 lg:columns-3 gap-4">
     {
       projectData.map((project) => (
-        <li class="mb-8">
+        <div class="break-inside-avoid mb-4">
           <a
             href={`${import.meta.env.BASE_URL}/projects/${project.slug}`}
             class="text-decoration-none text-inherit"
@@ -32,6 +20,7 @@ import Layout from "../layouts/Layout.astro";
                 alt={project.title}
                 width={300}
                 height={300}
+                class="w-full h-auto"
               />
             </div>
 
@@ -40,8 +29,8 @@ import Layout from "../layouts/Layout.astro";
               <p class="text-sm text-gray-700">{project.year}</p>
             </div>
           </a>
-        </li>
+        </div>
       ))
     }
-  </ul>
+  </div>
 </Layout>
