@@ -1,4 +1,4 @@
 ---
-title: Personal projects
+title: Other
+order: 50
 ---
-

@@ -28,15 +28,16 @@ const allImages = import.meta.glob<{ default: ImageMetadata }>(`/src/projects/**
 const allProjects = import.meta.glob(`/src/projects/**/description.md`);
 const allCategories = import.meta.glob(`/src/projects/**/category.md`);
 
-export const categoryData = await Promise.all(Object.entries(allCategories).map(async ([key, value]) => {
-  const data = (await value()) as { frontmatter: { title: string } };
+export const categoryData = (await Promise.all(Object.entries(allCategories).map(async ([key, value]) => {
+  const data = (await value()) as { frontmatter: { title: string, order: number } };
   const slug = key.split('/').slice(-2, -1)[0];
   console.debug("Category", data.frontmatter);
   return {
     slug,
     title: data.frontmatter.title,
+    order: data.frontmatter.order ?? 0,
   };
-}));
+}))).sort((a, b) => a.order - b.order);
 
 export const projectData: ProjectData[] = await Promise.all(Object.entries(allProjects).map(async ([key, value]) => {
   const data = (await value()) as { frontmatter: ProjectDataFrontmatter, rawContent: () => string };
@@ -47,8 +48,8 @@ export const projectData: ProjectData[] = await Promise.all(Object.entries(allPr
 
   const projectKeyPrefix = `/src/projects/${categorySlug}/${slug}`;
 
- const images = Object.entries(allImages).filter(([key, value]) => key.includes(projectKeyPrefix)).map(([key, value]) => value);
- const covers = Object.entries(allImages).filter(([key, value]) => key.includes(`${projectKeyPrefix}/cover`)).map(([key, value]) => value);
+  const images = Object.entries(allImages).filter(([key, value]) => key.includes(projectKeyPrefix)).map(([key, value]) => value);
+  const covers = Object.entries(allImages).filter(([key, value]) => key.includes(`${projectKeyPrefix}/cover`) || key.includes(`${projectKeyPrefix}/_cover`)).map(([key, value]) => value);
   return {
     slug,
     title: data.frontmatter.title,

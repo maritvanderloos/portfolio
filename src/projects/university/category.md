@@ -1,3 +1,3 @@
 ---
-title: University Projects
+title: University
 ---

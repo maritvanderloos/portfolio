@@ -21,14 +21,32 @@ if (!project) {
   console.error("Project not found!", slug);
 }
 
+
 // const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
 // const projectImages = Object.entries(allImages).filter(([key, value]) => key.includes(slug));
+//
+
+// const images = await Promise.all(project.images.map(async i => await i()));
+const imagesSrcRegex = /src="\.\/([^"]+)"/g;
+// console.log("image -->", images[0].default.src)
+// console.log(project.images[0].name)
+// const a = /src="\.\/([^"]+)"/g;
+const matches = project.descriptionHtml.match(imagesSrcRegex) || [];
+await Promise.all(matches.map(async (match) => {
+  const imageSrc = match.replace(imagesSrcRegex, "$1");
+  const image = project.images.find(i => i.name.endsWith(imageSrc.slice(1, imageSrc.length))); // remove first dot
+  if (image) {
+    project.descriptionHtml = project.descriptionHtml.replace(match, `src="${(await image()).default.src}"`);
+  }
+}));
+console.log({ matches, images: project.images })
 ---
 
 <Layout>
   <div class="prose">
     <p><a href="/portfolio">← Back to home</a></p>
-    <h1>{project.title}</h1>
+    <span>{project.category.title} - {project.year}</span>
+    <h1 class="font-serif text-5xl">{project.title}</h1>
     <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
     <div set:html={project.descriptionHtml} />
   </div>
@@ -36,8 +54,10 @@ if (!project) {
 
   <MasonryImageGrid client:load>
     {
-      project.images.map(async (img) => (
-      <div class="w-[250px]" data-masonry-item>
+      project.images
+        .filter(img => !img.name.split('/').pop()!.startsWith('_'))
+        .map(async (img) => (
+      <div class="max-w-[250px]" data-masonry-item>
         <FullScreenable client:load src={await img()}>
           <div slot="image">
           <Image
