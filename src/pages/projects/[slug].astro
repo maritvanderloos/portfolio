@@ -21,7 +21,6 @@ if (!project) {
   console.error("Project not found!", slug);
 }
 
-
 // const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
 // const projectImages = Object.entries(allImages).filter(([key, value]) => key.includes(slug));
 //
@@ -31,15 +30,119 @@ const imagesSrcRegex = /src="\.\/([^"]+)"/g;
 // console.log("image -->", images[0].default.src)
 // console.log(project.images[0].name)
 // const a = /src="\.\/([^"]+)"/g;
+console.log("project.descriptionHtml", project.descriptionHtml);
 const matches = project.descriptionHtml.match(imagesSrcRegex) || [];
-await Promise.all(matches.map(async (match) => {
-  const imageSrc = match.replace(imagesSrcRegex, "$1");
-  const image = project.images.find(i => i.name.endsWith(imageSrc.slice(1, imageSrc.length))); // remove first dot
-  if (image) {
-    project.descriptionHtml = project.descriptionHtml.replace(match, `src="${(await image()).default.src}"`);
-  }
-}));
+await Promise.all(
+  matches.map(async (match) => {
+    const imageSrc = match.replace(imagesSrcRegex, "$1");
+    const image = project.images.find((i) =>
+      i.name.endsWith(imageSrc.slice(1, imageSrc.length))
+    ); // remove first dot
+    if (image) {
+      project.descriptionHtml = project.descriptionHtml.replace(
+        match,
+        `src="${(await image()).default.src}"`
+      );
+    }
+  })
+);
 // console.log({ matches, images: project.images })
+
+// enum SectionType {
+//   HTML,
+//   MasonryImageGrid,
+// }
+
+let imagesToShow = project.images.filter((img) => !img.name.split("/").pop()!.startsWith("_"));
+
+type Section =
+  | {
+      type: "html";
+      html: string;
+    }
+  | {
+      type: "masonry-image-grid";
+      height: string;
+      width: string;
+      images: (() => Promise<{ default: ImageMetadata }>)[];
+      smColumns?: number;
+      mdColumns?: number;
+      lgColumns?: number;
+    }
+  | {
+      type: "image";
+      src: string;
+      height: string;
+      width: string;
+    };
+
+function parseIntoSections(html: string): Section[] {
+  const sections: Section[] = [];
+  let lastIndex = 0;
+  // Updated regex to match Images tag with attributes in any order
+  const regex = /<Images\s+((?:images|height|width|smColumns|mdColumns|lgColumns)="[^"]+"\s*)+\/?>/g;
+  let match;
+
+  while ((match = regex.exec(html)) !== null) {
+    // Add HTML section before the MasonryImageGrid if there's content
+    if (match.index > lastIndex) {
+      sections.push({
+        type: "html",
+        html: html.substring(lastIndex, match.index),
+      });
+    }
+
+    // Extract attributes using individual regex patterns
+    const fullTag = match[0];
+    const imagesMatch = /images="([^"]+)"/.exec(fullTag);
+    const heightMatch = /height="([^"]+)"/.exec(fullTag);
+    const widthMatch = /width="([^"]+)"/.exec(fullTag);
+    const smColumnsMatch = /smColumns="([^"]+)"/.exec(fullTag);
+    const mdColumnsMatch = /mdColumns="([^"]+)"/.exec(fullTag);
+    const lgColumnsMatch = /lgColumns="([^"]+)"/.exec(fullTag);
+
+    if (!imagesMatch) {
+      console.error("Images attribute is required in <Images> tag");
+      lastIndex = match.index + match[0].length;
+      continue;
+    }
+
+    // Add the MasonryImageGrid section
+    const imageNames = imagesMatch[1].split(",").map((img) => img.trim());
+
+    // Find the matching images from project.images
+    const images = project.images.filter((img) => {
+      const imgFileName = img.name.split("/").pop()!;
+      return imageNames.includes(imgFileName);
+    });
+
+    imagesToShow = imagesToShow.filter((img) => !images.includes(img));
+
+    sections.push({
+      type: "masonry-image-grid",
+      height: heightMatch ? heightMatch[1] : "400px",
+      width: widthMatch ? widthMatch[1] : "100%",
+      images,
+      smColumns: smColumnsMatch ? parseInt(smColumnsMatch[1]) : undefined,
+      mdColumns: mdColumnsMatch ? parseInt(mdColumnsMatch[1]) : undefined,
+      lgColumns: lgColumnsMatch ? parseInt(lgColumnsMatch[1]) : undefined,
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add any remaining HTML after the last MasonryImageGrid
+  if (lastIndex < html.length) {
+    sections.push({
+      type: "html",
+      html: html.substring(lastIndex),
+    });
+  }
+
+  return sections;
+}
+
+console.log("PARSED SECTIONS", parseIntoSections(project.descriptionHtml));
 ---
 
 <Layout>
@@ -48,35 +151,86 @@ await Promise.all(matches.map(async (match) => {
     <span>{project.category.title} - {project.year}</span>
     <h1 class="font-serif text-5xl">{project.title}</h1>
     <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
-    <div set:html={project.descriptionHtml} />
-  </div>
-  <div class="w-full h-full">
-
-  <MasonryImageGrid client:load>
+    <!-- <div set:html={project.descriptionHtml} /> -->
     {
-      project.images
-        .filter(img => !img.name.split('/').pop()!.startsWith('_'))
-        .map(async (img) => (
-      <div class="max-w-[250px]" data-masonry-item>
-        <FullScreenable client:load src={await img()}>
-          <div slot="image">
-          <Image
-            src={img()}
-            alt="Additional project image"
-            width={300}
-            height={300}
-            />
-          </div>
-          <div slot="full-screen">
-            <Image
-              src={img()}
-              alt="Additional project image"
-            />
-          </div>
-        </FullScreenable>
-        </div>
-      ))
+      parseIntoSections(project.descriptionHtml).map((section, index) => {
+        switch (section.type) {
+          case "html":
+            return <div set:html={section.html} id={`section-${index}`} />;
+          case "masonry-image-grid":
+            return (
+              // <div class="flex flex-col gap-4 w-full" style={`height: ${section.height};`} id={`section-${index}`}>
+              // <div class="flex flex-col gap-4 w-full h-fit" id={`section-${index}`}>
+
+              <div
+                class="image-grid grid"
+                id={`section-${index}`}
+                style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};`}
+              >
+                {section.images.map(async (img) => (
+                  <div class="" data-masonry-item>
+                    <FullScreenable src={await img()}>
+                      <div slot="image">
+                        <Image
+                          src={img()}
+                          alt="Project image"
+                          width={parseInt(section.width) || 300}
+                          height={parseInt(section.height) || 300}
+                        />
+                      </div>
+                      <div slot="full-screen">
+                        <Image src={img()} alt="Project image" />
+                      </div>
+                    </FullScreenable>
+                  </div>
+                ))}
+                {/* </MasonryImageGrid> */}
+              </div>
+            );
+        }
+      })
     }
+  <!-- </div> -->
+  <!-- <div class="w-full h-full"> -->
+    <MasonryImageGrid>
+      {
+        imagesToShow.map(async (img) => (
+            <div class="max-w-[250px]" data-masonry-item>
+              <FullScreenable client:load src={await img()}>
+                <div slot="image">
+                  <Image
+                    src={img()}
+                    alt="Additional project image"
+                    width={300}
+                    height={300}
+                  />
+                </div>
+                <div slot="full-screen">
+                  <Image src={img()} alt="Additional project image" />
+                </div>
+              </FullScreenable>
+            </div>
+          ))
+      }
     </MasonryImageGrid>
-</div>
+  </div>
 </Layout>
+
+<style>
+  .image-grid {
+    display: grid;
+    grid-template-rows: 1;
+    grid-template-columns: repeat(var(--smColumns), 1fr);
+    gap: 1rem;
+  }
+  @media (min-width: 768px) {
+    div.image-grid {
+      grid-template-columns: repeat(var(--mdColumns), 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    div.image-grid {
+      grid-template-columns: repeat(var(--lgColumns), 1fr);
+    }
+  }
+</style>
