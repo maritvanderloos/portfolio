@@ -16,7 +16,7 @@ import Layout from "../../layouts/Layout.astro";
 
 const { slug } = Astro.params;
 const category = getCategoryBySlug(slug)!;
-const projects: ProjectData[] = getProjectsByCategory(slug)!;
+const projects: ProjectData[] = await getProjectsByCategory(slug)!;
 
 if (!projects) {
   console.error("Project not found!", slug);
