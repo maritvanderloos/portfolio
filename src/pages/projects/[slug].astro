@@ -3,6 +3,7 @@ import FullScreenable from "../../components/FullScreenable.svelte";
 import MasonryImageGrid from "../../components/MasonryImageGrid.svelte";
 import { Image } from "astro:assets";
 import { projectData } from "../../lib/getProjects";
+import { parse, HTMLElement, Node } from "node-html-parser";
 
 export function getStaticPaths() {
   return projectData.map((project) => ({
@@ -21,16 +22,9 @@ if (!project) {
   console.error("Project not found!", slug);
 }
 
-// const allImages = import.meta.glob<{default: ImageMetadata}>(`/src/projects/**/**.*{jpg,jpeg,png,gif,webp}`);
-// const projectImages = Object.entries(allImages).filter(([key, value]) => key.includes(slug));
-//
-
-// const images = await Promise.all(project.images.map(async i => await i()));
+// Process image sources in the HTML content
+let processedHtml = project.descriptionHtml;
 const imagesSrcRegex = /src="\.\/([^"]+)"/g;
-// console.log("image -->", images[0].default.src)
-// console.log(project.images[0].name)
-// const a = /src="\.\/([^"]+)"/g;
-console.log("project.descriptionHtml", project.descriptionHtml);
 const matches = project.descriptionHtml.match(imagesSrcRegex) || [];
 await Promise.all(
   matches.map(async (match) => {
@@ -39,22 +33,20 @@ await Promise.all(
       i.name.endsWith(imageSrc.slice(1, imageSrc.length))
     ); // remove first dot
     if (image) {
-      project.descriptionHtml = project.descriptionHtml.replace(
+      processedHtml = processedHtml.replace(
         match,
         `src="${(await image()).default.src}"`
       );
     }
   })
 );
-// console.log({ matches, images: project.images })
 
-// enum SectionType {
-//   HTML,
-//   MasonryImageGrid,
-// }
+// Filter images that don't start with underscore for the additional images section
+let imagesToShow = project.images.filter(
+  (img) => !img.name.split("/").pop()!.startsWith("_")
+);
 
-let imagesToShow = project.images.filter((img) => !img.name.split("/").pop()!.startsWith("_"));
-
+// Define section types
 type Section =
   | {
       type: "html";
@@ -70,84 +62,156 @@ type Section =
       lgColumns?: number;
     }
   | {
-      type: "image";
-      src: string;
+      type: "single-image";
+      src: (() => Promise<{ default: ImageMetadata }>);
       height: string;
+      maxHeight: string;
+      maxWidth: string;
       width: string;
+      alt: string;
     };
 
+function getAndDisplaceProjectImage(...imageNames: string[]) {
+  const images = project.images.filter((img) => {
+              const imgFileName = img.name.split("/").pop()!;
+              return imageNames.includes(imgFileName);
+            });
+
+  // Remove these images from imagesToShow
+  imagesToShow = imagesToShow.filter((img) => !images.includes(img));
+  return images;
+}
+
+/**
+ * Parse HTML content into sections
+ * This uses a proper HTML parser instead of regex for more robust handling
+ */
 function parseIntoSections(html: string): Section[] {
-
-  // HACK macro to translate <Image src="x" width="y" height="z" /> into <Images images="x" height="y" width="z" smColumns="1" mdColumns="1" lgColumns="1" />
-  const macro = /<Image\s+src="([^"]+)"\s+width="([^"]+)"\s+height="([^"]+)"\s+\/>/g;
-  html = html.replace(macro, '<Images images="$1" height="$2" width="$3" smColumns="1" mdColumns="1" lgColumns="1" />');
-
   const sections: Section[] = [];
-  let lastIndex = 0;
-  // Updated regex to match Images tag with attributes in any order
-  const regex = /<Images\s+((?:images|height|width|smColumns|mdColumns|lgColumns)="[^"]+"\s*)+\/?>/g;
-  let match;
 
-  while ((match = regex.exec(html)) !== null) {
-    // Add HTML section before the MasonryImageGrid if there's content
-    if (match.index > lastIndex) {
+  try {
+    // First, convert single Image tags to Images tags for consistency
+    const root = parse(html);
+
+    // Process all Image tags and convert them to Images tags
+    // root.querySelectorAll('single-image').forEach((imageTag: HTMLElement) => {
+    //   try {
+    //     const src = imageTag.getAttribute('src');
+    //     const width = imageTag.getAttribute('width');
+    //     const height = imageTag.getAttribute('height');
+
+    //     if (src) {
+    //       const imagesTag = parse(`<Images images="${src}" width="${width || '300'}" height="${height || '300'}" smColumns="1" mdColumns="1" lgColumns="1" />`);
+    //       imageTag.replaceWith(imagesTag);
+    //     }
+    //   } catch (error) {
+    //     console.error('Error processing Image tag:', error);
+    //   }
+    // });
+
+    // Get the modified HTML
+    const modifiedHtml = root.toString();
+
+    // Now parse the HTML into sections
+    const parsedRoot = parse(modifiedHtml);
+    const childNodes = [...parsedRoot.childNodes];
+
+    let currentHtmlSection = "";
+
+    for (let i = 0; i < childNodes.length; i++) {
+      const node = childNodes[i];
+
+      if (
+        node.nodeType === 1 &&
+        (node as HTMLElement).tagName === "SINGLE-IMAGE"
+      ) {
+        // If we have accumulated HTML content, add it as an HTML section
+        if (currentHtmlSection.trim()) {
+          sections.push({
+            type: "single-image",
+            // src: (node as HTMLElement).getAttribute("src") || "",
+            src: getAndDisplaceProjectImage(
+              (node as HTMLElement).getAttribute("src") || ""
+            )[0],
+            maxWidth: (node as HTMLElement).getAttribute("max-width") || "100%",
+            maxHeight:
+              (node as HTMLElement).getAttribute("max-height") || "100%",
+            width: (node as HTMLElement).getAttribute("width") || "100%",
+            height: (node as HTMLElement).getAttribute("height") || "100%",
+            alt: (node as HTMLElement).getAttribute("alt") || "",
+          });
+        }
+      }
+
+      // Check if this is an Images tag
+      if (node.nodeType === 1 && (node as HTMLElement).tagName === "IMAGES") {
+        // If we have accumulated HTML content, add it as an HTML section
+        if (currentHtmlSection.trim()) {
+          sections.push({
+            type: "html",
+            html: currentHtmlSection.trim(),
+          });
+          currentHtmlSection = "";
+        }
+
+        try {
+          // Extract attributes from the Images tag
+          const element = node as HTMLElement;
+          const imagesAttr = element.getAttribute("images");
+          const heightAttr = element.getAttribute("height");
+          const widthAttr = element.getAttribute("width");
+          const smColumnsAttr = element.getAttribute("smColumns");
+          const mdColumnsAttr = element.getAttribute("mdColumns");
+          const lgColumnsAttr = element.getAttribute("lgColumns");
+
+          if (imagesAttr) {
+            const imageNames = imagesAttr
+              .split(",")
+              .map((img: string) => img.trim());
+
+            // Add the masonry image grid section
+            sections.push({
+              type: "masonry-image-grid",
+              height: heightAttr || "400px",
+              width: widthAttr || "100%",
+              images: getAndDisplaceProjectImage(...imageNames),
+              smColumns: smColumnsAttr ? parseInt(smColumnsAttr) : undefined,
+              mdColumns: mdColumnsAttr ? parseInt(mdColumnsAttr) : undefined,
+              lgColumns: lgColumnsAttr ? parseInt(lgColumnsAttr) : undefined,
+            });
+          }
+        } catch (error) {
+          console.error("Error processing Images tag:", error);
+          // If there's an error, just add the node as HTML
+          currentHtmlSection += node.toString();
+        }
+      } else {
+        // For other nodes, accumulate HTML content
+        currentHtmlSection += node.toString();
+      }
+    }
+
+    // Add any remaining HTML content
+    if (currentHtmlSection.trim()) {
       sections.push({
         type: "html",
-        html: html.substring(lastIndex, match.index),
+        html: currentHtmlSection.trim(),
       });
     }
-
-    // Extract attributes using individual regex patterns
-    const fullTag = match[0];
-    const imagesMatch = /images="([^"]+)"/.exec(fullTag);
-    const heightMatch = /height="([^"]+)"/.exec(fullTag);
-    const widthMatch = /width="([^"]+)"/.exec(fullTag);
-    const smColumnsMatch = /smColumns="([^"]+)"/.exec(fullTag);
-    const mdColumnsMatch = /mdColumns="([^"]+)"/.exec(fullTag);
-    const lgColumnsMatch = /lgColumns="([^"]+)"/.exec(fullTag);
-
-    if (!imagesMatch) {
-      console.error("Images attribute is required in <Images> tag");
-      lastIndex = match.index + match[0].length;
-      continue;
-    }
-
-    // Add the MasonryImageGrid section
-    const imageNames = imagesMatch[1].split(",").map((img) => img.trim());
-
-    // Find the matching images from project.images
-    const images = project.images.filter((img) => {
-      const imgFileName = img.name.split("/").pop()!;
-      return imageNames.includes(imgFileName);
-    });
-
-    imagesToShow = imagesToShow.filter((img) => !images.includes(img));
-
-    sections.push({
-      type: "masonry-image-grid",
-      height: heightMatch ? heightMatch[1] : "400px",
-      width: widthMatch ? widthMatch[1] : "100%",
-      images,
-      smColumns: smColumnsMatch ? parseInt(smColumnsMatch[1]) : undefined,
-      mdColumns: mdColumnsMatch ? parseInt(mdColumnsMatch[1]) : undefined,
-      lgColumns: lgColumnsMatch ? parseInt(lgColumnsMatch[1]) : undefined,
-    });
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Add any remaining HTML after the last MasonryImageGrid
-  if (lastIndex < html.length) {
+  } catch (error) {
+    console.error("Error parsing HTML:", error);
+    // Fallback: return the entire HTML as a single section
     sections.push({
       type: "html",
-      html: html.substring(lastIndex),
+      html: html,
     });
   }
 
   return sections;
 }
 
-console.log("PARSED SECTIONS", parseIntoSections(project.descriptionHtml));
+const parsedSections = parseIntoSections(processedHtml);
+console.log("PARSED SECTIONS", parsedSections);
 ---
 
 <Layout>
@@ -158,17 +222,33 @@ console.log("PARSED SECTIONS", parseIntoSections(project.descriptionHtml));
     <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
     <!-- <div set:html={project.descriptionHtml} /> -->
     {
-      parseIntoSections(project.descriptionHtml).map((section, index) => {
+      parsedSections.map(async (section, index) => {
         switch (section.type) {
           case "html":
             return <div set:html={section.html} id={`section-${index}`} />;
+          case "single-image":
+            return (
+              <div id={`section-${index}`} class="relative">
+                <FullScreenable src={section.src()} client:load>
+                  <div slot="image">
+                    <Image
+                      src={section.src()}
+                      alt={section.alt}
+                      width={parseInt(section.width) || 300}
+                      height={parseInt(section.height) || 300}
+                      style={`max-width: ${section.maxWidth}; max-height: ${section.maxHeight};`}
+                    />
+                  </div>
+                  <div slot="full-screen">
+                    <Image src={section.src()} alt="Project image" />
+                  </div>
+                </FullScreenable>
+              </div>
+            );
           case "masonry-image-grid":
             return (
-              // <div class="flex flex-col gap-4 w-full" style={`height: ${section.height};`} id={`section-${index}`}>
-              // <div class="flex flex-col gap-4 w-full h-fit" id={`section-${index}`}>
-
               <div
-                class="image-grid grid relative"
+                class="image-grid grid relative max-w-[80ch]"
                 id={`section-${index}`}
                 style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};`}
               >
@@ -189,35 +269,33 @@ console.log("PARSED SECTIONS", parseIntoSections(project.descriptionHtml));
                     </FullScreenable>
                   </div>
                 ))}
-                {/* </MasonryImageGrid> */}
               </div>
             );
         }
       })
     }
-  <!-- </div> -->
   <!-- <div class="w-full h-full"> -->
-    <MasonryImageGrid>
-      {
-        imagesToShow.map(async (img) => (
-            <div class="max-w-[250px]" data-masonry-item>
-              <FullScreenable client:load src={await img()}>
-                <div slot="image">
-                  <Image
-                    src={img()}
-                    alt="Additional project image"
-                    width={300}
-                    height={300}
-                  />
-                </div>
-                <div slot="full-screen">
-                  <Image src={img()} alt="Additional project image" />
-                </div>
-              </FullScreenable>
+  <MasonryImageGrid>
+    {
+      imagesToShow.map(async (img) => (
+        <div class="max-w-[250px]" data-masonry-item>
+          <FullScreenable client:load src={await img()}>
+            <div slot="image">
+              <Image
+                src={img()}
+                alt="Additional project image"
+                width={300}
+                height={300}
+              />
             </div>
-          ))
-      }
-    </MasonryImageGrid>
+            <div slot="full-screen">
+              <Image src={img()} alt="Additional project image" />
+            </div>
+          </FullScreenable>
+        </div>
+      ))
+    }
+  </MasonryImageGrid>
   </div>
 </Layout>
 
