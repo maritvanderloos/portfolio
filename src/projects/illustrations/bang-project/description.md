@@ -5,7 +5,7 @@ year: 2023
 
 Story I wrote, illustrated, printed and bound about street intimidation and feeling unsafe at night. In the story, the protagonist wishes she had a big dog to protect her, the dog being a metaphor for the feeling of safety and security.
 I made this zine during my study Illustration at Hogeschool voor de Kunsten Utrecht. Through an iterative process of writing lessons, feedback from teachers and students and revisions, I was able to make my own 12-page book from scratch.
-
+<single-image src="cover.jpeg" height="500" width="500" caption="Front of the zine">
 Text:
 ```
 Bang in het donker
@@ -38,7 +38,7 @@ Who curls up on the couch as I sleep
 
 And who only bites men
 ```
+<images images="1page.jpeg,2page.jpeg,3page.jpeg" height="500px" width="500px" lgColumns="3" caption="The first four pages of the zine">
 
-**Medium**: Indian ink and water on aquarel paper
-<br>
+**Medium**: Indian ink and water on aquarel paper <br>
 **Size**: 18 * 26 cm
