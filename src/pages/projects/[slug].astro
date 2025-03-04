@@ -77,6 +77,11 @@ type Section =
     };
 
 function parseIntoSections(html: string): Section[] {
+
+  // HACK macro to translate <Image src="x" width="y" height="z" /> into <Images images="x" height="y" width="z" smColumns="1" mdColumns="1" lgColumns="1" />
+  const macro = /<Image\s+src="([^"]+)"\s+width="([^"]+)"\s+height="([^"]+)"\s+\/>/g;
+  html = html.replace(macro, '<Images images="$1" height="$2" width="$3" smColumns="1" mdColumns="1" lgColumns="1" />');
+
   const sections: Section[] = [];
   let lastIndex = 0;
   // Updated regex to match Images tag with attributes in any order
@@ -163,13 +168,13 @@ console.log("PARSED SECTIONS", parseIntoSections(project.descriptionHtml));
               // <div class="flex flex-col gap-4 w-full h-fit" id={`section-${index}`}>
 
               <div
-                class="image-grid grid"
+                class="image-grid grid relative"
                 id={`section-${index}`}
                 style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};`}
               >
                 {section.images.map(async (img) => (
                   <div class="" data-masonry-item>
-                    <FullScreenable src={await img()}>
+                    <FullScreenable src={await img()} client:load>
                       <div slot="image">
                         <Image
                           src={img()}

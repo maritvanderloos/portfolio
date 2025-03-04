@@ -6,6 +6,8 @@ For this project, I created a visual reportage of Lombok, a neighbourhood in Utr
 
 In a large drawing, I documented three social facilities in the neighbourhood: a community center, a language café and a children’s center. What they all have in common is their goal of creating social coherence by opening a space where people can come together.
 
+<Image src="IMG_5668.jpg" width="10000" height="1000" />
+
 What I liked about this project was to combine research with illustrating. It was a special experience to visit these places, engage in their activities, talk to people and make life drawings.
 
 
