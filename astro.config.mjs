@@ -7,7 +7,7 @@ export default defineConfig({
   // site: 'https://maritvanderloos.github.io',
   site: 'https://maritvanderloos.nl',
   // base: 'portfolio',
-  base: '/',
+  // base: '/',
   vite: {
     plugins: [tailwindcss()],
   },
