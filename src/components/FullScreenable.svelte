@@ -9,6 +9,7 @@
     let zoomOriginY = $state(0);
 
     function onClick() {
+        console.log("_----->> click!")
         console.debug("Full screen clicked");
         isFullScreen = !isFullScreen;
     }
