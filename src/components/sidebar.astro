@@ -1,5 +1,8 @@
 ---
+import { Image } from "astro:assets";
+import figs from "../../public/figs.png";
 import { projectData, categoryData } from "../lib/getProjects";
+import vldMaritText from "../../public/vdlmarit-text.jpg";
 
 const currentPath = Astro.url;
 const url = (href: string) => new URL(import.meta.env.BASE_URL + href, Astro.url.origin);
@@ -23,14 +26,16 @@ const isRouteActive = (url: URL) => {
 ---
 
 <aside
-    class="h-auto md:h-screen w-full md:w-52 flex flex-col justify-between bg-white py-6 px-4 border-r border-gray-100"
+    class="h-auto md:h-screen w-full md:w-52 flex flex-col justify-between bg-white py-6 px-4"
 >
     <div class="space-y-6">
         <!-- Logo -->
-        <div class="text-xl font-bold font-serif italic"><span class="inline-block"> Marit </span> <span class="inline-block"> van der Loos </span></div>
+        <Image src={figs} alt="Marit van der Loos" width={700} height={100} />
+        <!-- <Image src={vldMaritText} alt="Marit van der Loos" width={700} height={100} /> -->
+        <!-- <div class="text-xl font-bold font-serif italic"><span class="inline-block"> Marit </span> <span class="inline-block"> van der Loos </span></div> -->
 
         <!-- Navigation Links -->
-        <nav class="space-y-4 mt-auto text-sm">
+        <nav class="space-y-4 mt-auto text-sm px-2">
             {
                 navLinks.map((link) => (
                     <div>
@@ -63,7 +68,7 @@ const isRouteActive = (url: URL) => {
     </div>
 
     <!-- Footer -->
-    <footer class="hidden md:block text-gray-500 text-xs italic">
+    <footer class="hidden md:block text-gray-500 text-xs px-2">
         <p>© {new Date().getFullYear()} Marit van der Loos</p>
     </footer>
 </aside>
