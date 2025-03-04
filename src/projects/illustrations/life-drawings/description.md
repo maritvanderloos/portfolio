@@ -6,12 +6,11 @@ Throughout my year of studying illustration, I followed a weekly course about th
 
 Below are some of my favorite works that I made during this course. They include still lifes, abstract work and figure studies of (nude) models. 
 
+<Images images="big5.jpg,cover.jpg" height="800px" width="800px" lgColumns="2"/>
+<Images images="det1.jpg,det2.JPG,det3.JPG,det4.jpg" height="800px" width="800px" lgColumns="4"/>
+
+<Images images="big2.jpg,big6.jpg" height="800px" width="800px" lgColumns="2"/>
+<Images images="big3.jpg,big4.jpg" height="800px" width="800px" lgColumns="2"/>
+
 **Medium:** mixed media; ink, acrylic, gouache, ecoline, charcoal, pastels and more <br>
 **Size:** varies; around 50 x 70 cm
-
-<Images images="big1.jpg,big3.jpg" height="800px" width="800px" lgColumns="2"/>
-<Images images="detail1.jpg,detail2.JPG,detail3.jpg" height="800px" width="800px" lgColumns="3"/>
-
-<single-image src="big2.jpg" height="800px" width="800px"/>
-<Images images="big4.jpg,big5.jpg,cover.jpg" height="800px" width="800px" lgColumns="3"/>
-
