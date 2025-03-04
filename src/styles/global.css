@@ -1,32 +1,50 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    /* --font-sans: 'Funnel Display', sans-serif; */
+    /* --font-sans: 'Source Serif 4', serif; */
+    /* --font-sans: 'Inter', sans-serif; */
+}
+
 /* Register your custom font family and tell the browser where to find it. */
 /* @font-face {
     font-family: 'Playfair Display';
-    src: url('/fonts/PlayfairDisplay-VariableFont_wght.ttf') format('ttf');
+    src: url('../../public/fonts/PlayfairDisplay-VariableFont_wght.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Funnel Display';
+    src: url('../../public/fonts/FunnelDisplay-VariableFont_wght.ttf') format('ttf');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 } */
 
-@theme {
-    --font-serif: 'Playfair Display', serif;
-}
 
 h1,
 h2,
-h3 {
+h3,
+h4,
+h5,
+h6 {
     font-optical-sizing: auto;
     font-style: italic;
-    font-weight: 900 !important;
+    font-weight: 600 !important;
 }
 
 /* h1 {
     font-family: var(--font-serif);
 } */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap'); */
+/* @import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap'); */
+
 
 pre {
     background-color: transparent;
