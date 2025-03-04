@@ -92,24 +92,50 @@
 </div> -->
 
 <style lang="scss">
-  #masonry-grid {
-    display: grid;
-    grid-template-rows: auto;
-    grid-template-columns: repeat(var(--smColumns), 1fr);
-    gap: 1rem;
+  :global(#masonry-grid img) {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
 
-    :global(img) {
-      margin: 0;
-    }
+  :global(#masonry-grid > *) {
+    padding-top: var(--gap);
+    // margin-top: var(--gap);
+    // margin-bottom: var(--gap);
+  }
+
+  #masonry-grid {
+    --gap: 2rem;
+
+    // display: grid;
+    // grid-template-rows: auto;
+    // grid-template-columns: repeat(var(--smColumns), 1fr);
+    columns: var(--smColumns);
+    gap: var(--gap);
+
+        // margin-top: var(--gap);
+        // margin-bottom: var(--gap);
+      // &:first-child {
+      //   margin-top: 0;
+      // }
+
+      // &:not(:first-child) {
+
+      // }
+
+      // &:not(:last-child) {
+      // }
+    // }
   }
   @media (min-width: 768px) {
     #masonry-grid {
-      grid-template-columns: repeat(var(--mdColumns), 1fr);
+      // grid-template-columns: repeat(var(--mdColumns), 1fr);
+      columns: var(--mdColumns);
     }
   }
   @media (min-width: 1024px) {
     #masonry-grid {
-      grid-template-columns: repeat(var(--lgColumns), 1fr);
+      // grid-template-columns: repeat(var(--lgColumns), 1fr);
+      columns: var(--lgColumns);
     }
   }
 </style>

@@ -1,5 +1,7 @@
 <script lang="ts">
+    import X from "lucide-svelte/icons/x";
     import { onDestroy, onMount, type Snippet } from "svelte";
+  import { cubicOut } from "svelte/easing";
     import { fade, fly, scale } from "svelte/transition";
 
     let container: HTMLDivElement;
@@ -41,18 +43,32 @@
         }
     }
 
+    function onThumbnailLoad() {
+    }
+
     onMount(() => {
         // add scroll listener to zoom in out on scroll
         globalThis?.window?.addEventListener("wheel", onWheel);
         globalThis?.window?.addEventListener("mousemove", onMouseMove);
         globalThis?.window?.addEventListener("keydown", onKeyDown);
+
     });
+
+    $effect(() => {
+        if (container) {
+            container.querySelector("img")?.addEventListener("load", onThumbnailLoad);
+        }
+    })
 
     onDestroy(() => {
         globalThis?.window?.removeEventListener("wheel", onWheel);
         globalThis?.window?.removeEventListener("mousemove", onMouseMove);
         globalThis?.window?.removeEventListener("keydown", onKeyDown);
+        container?.querySelector("img")?.removeEventListener("load", onThumbnailLoad);
     });
+
+    // let thumb: HTMLImageElement;
+    // console.log("thumb", thumb);
 </script>
 
 <div
@@ -63,7 +79,7 @@
     tabindex="0"
     class="cursor-zoom-in"
 >
-    <slot name="image" />
+    <slot name="image"/>
 </div>
 
 {#if isFullScreen}
@@ -71,20 +87,21 @@
         role="button"
         class="fullscreen-container transition-all duration-300 relative"
         class:fullscreen={isFullScreen}
-        transition:fade={{ duration: 150 }}
+        transition:fade={{ duration: 50 }}
         onclick={() => (isFullScreen = false)}
         tabindex="0"
         onkeydown={(e) => e.key === "Escape" && (isFullScreen = false)}
     >
         <button
-            class="top-8 right-8 absolute p-4 bg-blue-300 rounded-full w-10 h-10 flex items-center justify-center z-50 cursor-pointer"
+            transition:fly={{ y: 10, duration: 500, delay: 50, easing: cubicOut }}
+            class="top-8 right-8 absolute bg-pink-300 text-pink-900 rounded-full w-10 h-10 flex items-center justify-center z-50 cursor-pointer"
             class:hidden={!isFullScreen}
             onclick={(e) => {
                 e.stopPropagation();
                 isFullScreen = false;
             }}
         >
-            x
+            <X size={24} />
         </button>
         <div class="absolute inset-0 flex justify-center items-center">
             <div
@@ -92,6 +109,7 @@
             ></div>
         </div>
         <div
+            transition:fly={{ y: 20, duration: 100, delay: 0, easing: cubicOut }}
             class="z-50 transition-all duration-50 cursor-crosshair"
             style="transform: scale({zoom}); transform-origin: {zoomOriginX}% {zoomOriginY}%"
         >

@@ -261,7 +261,7 @@ console.log("PARSED SECTIONS", parsedSections);
                 data-type="masonry-image-grid"
                 class="image-grid grid relative max-w-[80ch]"
                 id={`section-${index}`}
-                style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};`}
+                style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};margin-top: ${section.marginY || '1rem'}; margin-bottom: ${section.marginY || '1rem'};`}
               >
                 {section.images.map((img) => (
                   <div class="" data-masonry-item>
@@ -272,7 +272,7 @@ console.log("PARSED SECTIONS", parsedSections);
                           alt="Project image"
                           width={parseInt(section.width) || 300}
                           height={parseInt(section.height) || 300}
-                          style={`margin-top: ${section.marginY || '1rem'}; margin-bottom: ${section.marginY || '1rem'};`}
+                          style={`margin-top: 0; margin-bottom: 0;`}
                         />
                       </div>
                       <div slot="full-screen">
@@ -282,9 +282,11 @@ console.log("PARSED SECTIONS", parsedSections);
                   </div>
                 ))}
               </div>
-              <div style={`margin-top: calc(${section.marginY || '1rem'} * -1);`}>
-                {section.caption && <div class="text-sm text-gray-500 mt-2 mb-12 text-left font-sans font-light italic">{section.caption}</div>}
-              </div>
+              <>{section.caption && 
+                <div style={`margin-top: calc(${section.marginY || '1rem'} * -1);`}>
+                  <div class="text-sm text-gray-500 mt-2 mb-12 text-left font-sans font-light italic">{section.caption}</div>
+                </div>}
+              </>
             );
         }
       })
@@ -293,7 +295,7 @@ console.log("PARSED SECTIONS", parsedSections);
       <MasonryImageGrid>
         {
           imagesToShow.map((img) => (
-            <div class="max-w-[250px]" data-masonry-item>
+            <div class="" data-masonry-item>
               <FullScreenable client:load src={img()}>
                 <div slot="image">
                   <Image
@@ -301,6 +303,7 @@ console.log("PARSED SECTIONS", parsedSections);
                     alt="Additional project image"
                     width={300}
                     height={300}
+                    style={`margin-top: 0; margin-bottom: 0;`}
                   />
                 </div>
                 <div slot="full-screen">
