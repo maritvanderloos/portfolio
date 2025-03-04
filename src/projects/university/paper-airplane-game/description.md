@@ -1,6 +1,7 @@
 ---
 title: Paper Airplane game
 year: 2024
+order: 5
 ---
 I developed a paper-airplane game in Processing, a Java-based language designed for visual arts and interactive media. In this game, the goal is to guide a flock of migrating birds safely to their destination using a paper airplane. The player launches the airplane with a catapult and then controls the ‘wind’ using their mouse. When the paper airplane hits the ground, the player starts over with the catapult again.
 

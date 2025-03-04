@@ -1,6 +1,7 @@
 ---
 title: Music Motion Creation
 year: 2025
+order: 1
 ---
 This project explores the design of an interactive music system that transforms movement into sound. Our goal was to create a more engaging and physical way for beginner musicians to compose music. The system is easy to learn, and requires no physical instruments: in a sense, it turns your body into the instrument.
 

@@ -1,6 +1,7 @@
 ---
 title: Going in circles
 year: 2024
+order: 4
 ---
 For this project, I worked with a group to design an interactive art installation.  We were asked to create a system that evokes emotional experiences rather than focusing on practical use or functionality. As a theme, we explored the perception of time and productivity.
 

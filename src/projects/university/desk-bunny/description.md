@@ -1,6 +1,7 @@
 ---
 title: Desk Bunny
 year: 2024
+order: 2
 ---
 For this project, my three teammates and I collaborated with VIMO Solutions, a technology start-up focused on health and activity. As our client, they asked us to design a product that motivates office workers to increase their physical activity during work hours. 
 

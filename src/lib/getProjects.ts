@@ -41,7 +41,7 @@ export const categoryData = (await Promise.all(Object.entries(allCategories).map
 }))).sort((a, b) => a.order - b.order);
 
 console.debug("All projects");
-export const projectData: Promise<ProjectData[]> = Promise.all(Object.entries(allProjects).map(async ([key, value]) => {
+export const projectData: Promise<ProjectData[]> = (Promise.all(Object.entries(allProjects).map(async ([key, value]) => {
   const data = (await value()) as { frontmatter: ProjectDataFrontmatter, rawContent: () => string };
   // console.debug("> >", data.rawContent().trim());
   const categorySlug = key.split('/').slice(-3, -2)[0];
@@ -56,12 +56,13 @@ export const projectData: Promise<ProjectData[]> = Promise.all(Object.entries(al
     slug,
     title: data.frontmatter.title,
     year: data.frontmatter.year,
+    order: data.frontmatter.order ?? 99999,
     category: categoryData.find((category) => category.slug === categorySlug)!,
     descriptionHtml: await marked.parse(data.rawContent().replaceAll("", "").trim()),
     images,
     covers,
   };
-}));
+}))).then(p => p.sort((a, b) => a.order-b.order));
 
 console.debug("Category data", categoryData);
 console.debug("Project data", projectData);

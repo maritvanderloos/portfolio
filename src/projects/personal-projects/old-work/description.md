@@ -1,6 +1,7 @@
 ---
 title: Old Work
 year: 2022
+order: 5
 ---
 This is a selection of artworks I created during my last years of high school, including both school projects and independent works. They include:
 
