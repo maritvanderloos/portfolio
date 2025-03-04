@@ -6,4 +6,4 @@ One of my first programming projects was creating this animal-like creature. It 
 
 <img src="./_creains.jpg">
 
-When you click on the wall socket, the creature gets “electrocuted’: his whiskers get spikey.
+When you click on the wall socket, the creature gets "electrocuted": his whiskers get spikey.
