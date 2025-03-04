@@ -61,6 +61,7 @@ type Section =
       mdColumns?: number;
       lgColumns?: number;
       marginY?: string;
+      caption?: string;
     }
   | {
       type: "single-image";
@@ -71,6 +72,7 @@ type Section =
       width: string;
       alt: string;
       marginY?: string;
+      caption?: string;
     };
 
 function getAndDisplaceProjectImage(...imageNames: string[]) {
@@ -136,6 +138,7 @@ function parseIntoSections(html: string): Section[] {
               width: (node as HTMLElement).getAttribute("width") || "100%",
               height: (node as HTMLElement).getAttribute("height") || "100%",
               alt: (node as HTMLElement).getAttribute("alt") || "",
+              caption: (node as HTMLElement).getAttribute("caption") || "",
               marginY: (node as HTMLElement).getAttribute("marginY") || "1rem",
             });
             return;
@@ -163,7 +166,7 @@ function parseIntoSections(html: string): Section[] {
             const mdColumnsAttr = element.getAttribute("mdColumns");
             const lgColumnsAttr = element.getAttribute("lgColumns");
             const marginYAttr = element.getAttribute("marginY");
-
+            const captionAttr = element.getAttribute("caption");
             if (imagesAttr) {
               const imageNames = imagesAttr
                 .split(",")
@@ -179,6 +182,7 @@ function parseIntoSections(html: string): Section[] {
                 mdColumns: mdColumnsAttr ? parseInt(mdColumnsAttr) : undefined,
                 lgColumns: lgColumnsAttr ? parseInt(lgColumnsAttr) : undefined,
                 marginY: marginYAttr || "1rem",
+                caption: captionAttr || "",
               });
               return;
             }
@@ -241,9 +245,11 @@ console.log("PARSED SECTIONS", parsedSections);
                       height={parseInt(section.height) || 300}
                       style={`max-width: ${section.maxWidth}; max-height: ${section.maxHeight}; margin-top: ${section.marginY || '1rem'}; margin-bottom: ${section.marginY || '1rem'};`}
                     />
+                    {section.caption && <div class="text-sm text-gray-500 -mt-2 mb-12 text-left font-sans font-light italic">{section.caption}</div>}
                   </div>
                   <div slot="full-screen">
-                    <Image src={section.src()} alt="Project image" />
+                    <Image src={section.src()} alt={section.alt} />
+                    {section.caption && <div class="text-md text-gray-500 pt-5 text-center font-sans font-light italic">{section.caption}</div>}
                   </div>
                 </FullScreenable>
               </div>
@@ -254,7 +260,7 @@ console.log("PARSED SECTIONS", parsedSections);
                 data-type="masonry-image-grid"
                 class="image-grid grid relative max-w-[80ch]"
                 id={`section-${index}`}
-                style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3}; margin-top: ${section.marginY || 0}; margin-bottom: ${section.marginY || 0};`}
+                style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};`}
               >
                 {section.images.map(async (img) => (
                   <div class="" data-masonry-item>
@@ -274,6 +280,9 @@ console.log("PARSED SECTIONS", parsedSections);
                     </FullScreenable>
                   </div>
                 ))}
+              </div>
+              <div style={`margin-top: calc(${section.marginY || '1rem'} * -1);`}>
+                {section.caption && <div class="text-sm text-gray-500 mt-2 mb-12 text-left font-sans font-light italic">{section.caption}</div>}
               </div>
             );
         }
