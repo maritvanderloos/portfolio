@@ -28,6 +28,7 @@ const allImages = import.meta.glob<{ default: ImageMetadata }>(`/src/projects/**
 const allProjects = import.meta.glob(`/src/projects/**/description.md`);
 const allCategories = import.meta.glob(`/src/projects/**/category.md`);
 
+
 export const categoryData = (await Promise.all(Object.entries(allCategories).map(async ([key, value]) => {
   const data = (await value()) as { frontmatter: { title: string, order: number } };
   const slug = key.split('/').slice(-2, -1)[0];
@@ -39,7 +40,8 @@ export const categoryData = (await Promise.all(Object.entries(allCategories).map
   };
 }))).sort((a, b) => a.order - b.order);
 
-export const projectData: ProjectData[] = await Promise.all(Object.entries(allProjects).map(async ([key, value]) => {
+console.debug("All projects");
+export const projectData: Promise<ProjectData[]> = Promise.all(Object.entries(allProjects).map(async ([key, value]) => {
   const data = (await value()) as { frontmatter: ProjectDataFrontmatter, rawContent: () => string };
   // console.debug("> >", data.rawContent().trim());
   const categorySlug = key.split('/').slice(-3, -2)[0];
@@ -66,15 +68,17 @@ console.debug("Project data", projectData);
 // console.debug("All projects", allProjects);
 // console.debug("All categories", allCategories);
 
-export function getProjectBySlug(slug: string): ProjectData | undefined {
-  return projectData.find((project) => project.slug === slug);
+export async function getProjectBySlug(slug: string): Promise<ProjectData | undefined> {
+  return (await projectData).find((project) => project.slug === slug);
 }
 
 export function getCategoryBySlug(slug: string): CategoryData | undefined {
   return categoryData.find((category) => category.slug === slug);
 }
 
-export function getProjectsByCategory(categorySlug: string): ProjectData[] {
+export async function getProjectsByCategory(categorySlug: string): Promise<ProjectData[]> {
   console.log('gettingproject by slug', categorySlug)
-  return projectData.filter((project) => project.category.slug === categorySlug);
+  return (await projectData).filter((project) => project.category.slug === categorySlug);
 }
+
+console.debug("All projects", projectData);

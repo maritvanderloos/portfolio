@@ -5,8 +5,9 @@ import { Image } from "astro:assets";
 import { projectData } from "../../lib/getProjects";
 import { parse, HTMLElement, Node } from "node-html-parser";
 
-export function getStaticPaths() {
-  return projectData.map((project) => ({
+export async function getStaticPaths() {
+  console.log("Getting static paths", await projectData);
+  return (await projectData).map((project) => ({
     params: { slug: project.slug },
   }));
 }
@@ -15,7 +16,7 @@ import { getProjectBySlug, type ProjectData } from "../../lib/getProjects";
 import Layout from "../../layouts/Layout.astro";
 
 const { slug } = Astro.params;
-const project: ProjectData = getProjectBySlug(slug)!;
+const project: ProjectData = (await getProjectBySlug(slug))!;
 console.debug("Project is", project);
 
 if (!project) {
@@ -229,7 +230,7 @@ console.log("PARSED SECTIONS", parsedSections);
     <!-- Use Astro's dangerouslySetInnerHTML for the pre-parsed HTML from Markdown -->
     <!-- <div set:html={project.descriptionHtml} /> -->
     {
-      parsedSections.map(async (section, index) => {
+      parsedSections.map((section, index) => {
         switch (section.type) {
           case "html":
             return <div set:html={section.html} id={`section-${index}`} data-type="html" />;
@@ -262,9 +263,9 @@ console.log("PARSED SECTIONS", parsedSections);
                 id={`section-${index}`}
                 style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};`}
               >
-                {section.images.map(async (img) => (
+                {section.images.map((img) => (
                   <div class="" data-masonry-item>
-                    <FullScreenable src={await img()} client:load>
+                    <FullScreenable src={img()} client:load>
                       <div slot="image">
                         <Image
                           src={img()}
@@ -291,9 +292,9 @@ console.log("PARSED SECTIONS", parsedSections);
     <div class="w-full h-full mt-10">
       <MasonryImageGrid>
         {
-          imagesToShow.map(async (img) => (
+          imagesToShow.map((img) => (
             <div class="max-w-[250px]" data-masonry-item>
-              <FullScreenable client:load src={await img()}>
+              <FullScreenable client:load src={img()}>
                 <div slot="image">
                   <Image
                     src={img()}

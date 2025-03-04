@@ -3,15 +3,18 @@ import "../styles/global.css";
 import { projectData } from "../lib/getProjects";
 import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
+
+const projects = await projectData;
 ---
 
 <Layout>
+
   <div class="columns-1 md:columns-2 lg:columns-3 gap-4">
     {
-      projectData.map((project) => (
+      projects.map((project) => (
         <div class="break-inside-avoid mb-4">
           <a
-            href={`${import.meta.env.BASE_URL}/projects/${project.slug}`}
+            href={`/projects/${project.slug}`}
             class="text-decoration-none text-inherit"
           >
             <div class="mb-4">
