@@ -60,22 +60,24 @@ type Section =
       smColumns?: number;
       mdColumns?: number;
       lgColumns?: number;
+      marginY?: string;
     }
   | {
       type: "single-image";
-      src: (() => Promise<{ default: ImageMetadata }>);
+      src: () => Promise<{ default: ImageMetadata }>;
       height: string;
       maxHeight: string;
       maxWidth: string;
       width: string;
       alt: string;
+      marginY?: string;
     };
 
 function getAndDisplaceProjectImage(...imageNames: string[]) {
   const images = project.images.filter((img) => {
-              const imgFileName = img.name.split("/").pop()!;
-              return imageNames.includes(imgFileName);
-            });
+    const imgFileName = img.name.split("/").pop()!;
+    return imageNames.includes(imgFileName);
+  });
 
   // Remove these images from imagesToShow
   imagesToShow = imagesToShow.filter((img) => !images.includes(img));
@@ -90,114 +92,115 @@ function parseIntoSections(html: string): Section[] {
   const sections: Section[] = [];
 
   try {
-    // First, convert single Image tags to Images tags for consistency
-    const root = parse(html);
-
-    // Process all Image tags and convert them to Images tags
-    // root.querySelectorAll('single-image').forEach((imageTag: HTMLElement) => {
-    //   try {
-    //     const src = imageTag.getAttribute('src');
-    //     const width = imageTag.getAttribute('width');
-    //     const height = imageTag.getAttribute('height');
-
-    //     if (src) {
-    //       const imagesTag = parse(`<Images images="${src}" width="${width || '300'}" height="${height || '300'}" smColumns="1" mdColumns="1" lgColumns="1" />`);
-    //       imageTag.replaceWith(imagesTag);
-    //     }
-    //   } catch (error) {
-    //     console.error('Error processing Image tag:', error);
-    //   }
-    // });
-
-    // Get the modified HTML
-    const modifiedHtml = root.toString();
-
-    // Now parse the HTML into sections
-    const parsedRoot = parse(modifiedHtml);
-    const childNodes = [...parsedRoot.childNodes];
-
-    let currentHtmlSection = "";
-
-    for (let i = 0; i < childNodes.length; i++) {
-      const node = childNodes[i];
-
-      if (
-        node.nodeType === 1 &&
-        (node as HTMLElement).tagName === "SINGLE-IMAGE"
-      ) {
-        // If we have accumulated HTML content, add it as an HTML section
-        if (currentHtmlSection.trim()) {
-          sections.push({
-            type: "single-image",
-            // src: (node as HTMLElement).getAttribute("src") || "",
-            src: getAndDisplaceProjectImage(
-              (node as HTMLElement).getAttribute("src") || ""
-            )[0],
-            maxWidth: (node as HTMLElement).getAttribute("max-width") || "100%",
-            maxHeight:
-              (node as HTMLElement).getAttribute("max-height") || "100%",
-            width: (node as HTMLElement).getAttribute("width") || "100%",
-            height: (node as HTMLElement).getAttribute("height") || "100%",
-            alt: (node as HTMLElement).getAttribute("alt") || "",
-          });
-        }
+    const elementsToParse = ["single-image", "images"];
+    html.split("\n").forEach((line) => {
+      if (!line.trim()) {
+        return;
       }
+      if (
+        !elementsToParse.some((element) =>
+          line.trim().toLowerCase().startsWith(`<${element}`.toLowerCase())
+        )
+      ) {
+        console.log("Pushing html section", line);
+        sections.push({
+          type: "html",
+          html: line,
+        });
+        return;
+      }
+      const root = parse(line);
+      const childNodes = [...root.childNodes];
 
-      // Check if this is an Images tag
-      if (node.nodeType === 1 && (node as HTMLElement).tagName === "IMAGES") {
-        // If we have accumulated HTML content, add it as an HTML section
-        if (currentHtmlSection.trim()) {
-          sections.push({
-            type: "html",
-            html: currentHtmlSection.trim(),
-          });
-          currentHtmlSection = "";
+      let currentHtmlSection = "";
+
+      for (let i = 0; i < childNodes.length; i++) {
+        const node = childNodes[i];
+        console.log("Processing node", node, node.nodeType);
+        if (
+          node.nodeType === 1 &&
+          (node as HTMLElement).tagName === "SINGLE-IMAGE"
+        ) {
+          // If we have accumulated HTML content, add it as an HTML section
+          // if (currentHtmlSection.trim()) {
+            sections.push({
+              type: "single-image",
+              // src: (node as HTMLElement).getAttribute("src") || "",
+              src: getAndDisplaceProjectImage(
+                (node as HTMLElement).getAttribute("src") || ""
+              )[0],
+              maxWidth:
+                (node as HTMLElement).getAttribute("max-width") || "100%",
+              maxHeight:
+                (node as HTMLElement).getAttribute("max-height") || "100%",
+              width: (node as HTMLElement).getAttribute("width") || "100%",
+              height: (node as HTMLElement).getAttribute("height") || "100%",
+              alt: (node as HTMLElement).getAttribute("alt") || "",
+              marginY: (node as HTMLElement).getAttribute("marginY") || "1rem",
+            });
+            return;
+          // }
         }
 
-        try {
-          // Extract attributes from the Images tag
-          const element = node as HTMLElement;
-          const imagesAttr = element.getAttribute("images");
-          const heightAttr = element.getAttribute("height");
-          const widthAttr = element.getAttribute("width");
-          const smColumnsAttr = element.getAttribute("smColumns");
-          const mdColumnsAttr = element.getAttribute("mdColumns");
-          const lgColumnsAttr = element.getAttribute("lgColumns");
+        // Check if this is an Images tag
+        if (node.nodeType === 1 && (node as HTMLElement).tagName === "IMAGES") {
+          // If we have accumulated HTML content, add it as an HTML section
+          // if (currentHtmlSection.trim()) {
+          //   sections.push({
+          //     type: "html",
+          //     html: currentHtmlSection.trim(),
+          //   });
+          //   currentHtmlSection = "";
+          // }
 
-          if (imagesAttr) {
-            const imageNames = imagesAttr
-              .split(",")
-              .map((img: string) => img.trim());
+          try {
+            // Extract attributes from the Images tag
+            const element = node as HTMLElement;
+            const imagesAttr = element.getAttribute("images");
+            const heightAttr = element.getAttribute("height");
+            const widthAttr = element.getAttribute("width");
+            const smColumnsAttr = element.getAttribute("smColumns");
+            const mdColumnsAttr = element.getAttribute("mdColumns");
+            const lgColumnsAttr = element.getAttribute("lgColumns");
+            const marginYAttr = element.getAttribute("marginY");
 
-            // Add the masonry image grid section
-            sections.push({
-              type: "masonry-image-grid",
-              height: heightAttr || "400px",
-              width: widthAttr || "100%",
-              images: getAndDisplaceProjectImage(...imageNames),
-              smColumns: smColumnsAttr ? parseInt(smColumnsAttr) : undefined,
-              mdColumns: mdColumnsAttr ? parseInt(mdColumnsAttr) : undefined,
-              lgColumns: lgColumnsAttr ? parseInt(lgColumnsAttr) : undefined,
-            });
+            if (imagesAttr) {
+              const imageNames = imagesAttr
+                .split(",")
+                .map((img: string) => img.trim());
+
+              // Add the masonry image grid section
+              sections.push({
+                type: "masonry-image-grid",
+                height: heightAttr || "400px",
+                width: widthAttr || "100%",
+                images: getAndDisplaceProjectImage(...imageNames),
+                smColumns: smColumnsAttr ? parseInt(smColumnsAttr) : undefined,
+                mdColumns: mdColumnsAttr ? parseInt(mdColumnsAttr) : undefined,
+                lgColumns: lgColumnsAttr ? parseInt(lgColumnsAttr) : undefined,
+                marginY: marginYAttr || "1rem",
+              });
+              return;
+            }
+          } catch (error) {
+            console.error("Error processing Images tag:", error);
+            // If there's an error, just add the node as HTML
+            currentHtmlSection += node.toString();
           }
-        } catch (error) {
-          console.error("Error processing Images tag:", error);
-          // If there's an error, just add the node as HTML
+        } else {
+          // For other nodes, accumulate HTML content
           currentHtmlSection += node.toString();
         }
-      } else {
-        // For other nodes, accumulate HTML content
-        currentHtmlSection += node.toString();
       }
-    }
 
-    // Add any remaining HTML content
-    if (currentHtmlSection.trim()) {
-      sections.push({
-        type: "html",
-        html: currentHtmlSection.trim(),
-      });
-    }
+      // Add any remaining HTML content
+      if (currentHtmlSection.trim()) {
+        sections.push({
+          type: "html",
+          html: currentHtmlSection.trim(),
+        });
+      }
+    });
   } catch (error) {
     console.error("Error parsing HTML:", error);
     // Fallback: return the entire HTML as a single section
@@ -225,10 +228,10 @@ console.log("PARSED SECTIONS", parsedSections);
       parsedSections.map(async (section, index) => {
         switch (section.type) {
           case "html":
-            return <div set:html={section.html} id={`section-${index}`} />;
+            return <div set:html={section.html} id={`section-${index}`} data-type="html" />;
           case "single-image":
             return (
-              <div id={`section-${index}`} class="relative">
+              <div id={`section-${index}`} class="relative" data-type="single-image">
                 <FullScreenable src={section.src()} client:load>
                   <div slot="image">
                     <Image
@@ -236,7 +239,7 @@ console.log("PARSED SECTIONS", parsedSections);
                       alt={section.alt}
                       width={parseInt(section.width) || 300}
                       height={parseInt(section.height) || 300}
-                      style={`max-width: ${section.maxWidth}; max-height: ${section.maxHeight};`}
+                      style={`max-width: ${section.maxWidth}; max-height: ${section.maxHeight}; margin-top: ${section.marginY || '1rem'}; margin-bottom: ${section.marginY || '1rem'};`}
                     />
                   </div>
                   <div slot="full-screen">
@@ -248,9 +251,10 @@ console.log("PARSED SECTIONS", parsedSections);
           case "masonry-image-grid":
             return (
               <div
+                data-type="masonry-image-grid"
                 class="image-grid grid relative max-w-[80ch]"
                 id={`section-${index}`}
-                style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3};`}
+                style={`--smColumns: ${section.smColumns || 2}; --mdColumns: ${section.mdColumns || 3}; --lgColumns: ${section.lgColumns || 3}; margin-top: ${section.marginY || 0}; margin-bottom: ${section.marginY || 0};`}
               >
                 {section.images.map(async (img) => (
                   <div class="" data-masonry-item>
@@ -261,6 +265,7 @@ console.log("PARSED SECTIONS", parsedSections);
                           alt="Project image"
                           width={parseInt(section.width) || 300}
                           height={parseInt(section.height) || 300}
+                          style={`margin-top: ${section.marginY || '1rem'}; margin-bottom: ${section.marginY || '1rem'};`}
                         />
                       </div>
                       <div slot="full-screen">
@@ -274,32 +279,42 @@ console.log("PARSED SECTIONS", parsedSections);
         }
       })
     }
-  <!-- <div class="w-full h-full"> -->
-  <MasonryImageGrid>
-    {
-      imagesToShow.map(async (img) => (
-        <div class="max-w-[250px]" data-masonry-item>
-          <FullScreenable client:load src={await img()}>
-            <div slot="image">
-              <Image
-                src={img()}
-                alt="Additional project image"
-                width={300}
-                height={300}
-              />
+    <div class="w-full h-full mt-10">
+      <MasonryImageGrid>
+        {
+          imagesToShow.map(async (img) => (
+            <div class="max-w-[250px]" data-masonry-item>
+              <FullScreenable client:load src={await img()}>
+                <div slot="image">
+                  <Image
+                    src={img()}
+                    alt="Additional project image"
+                    width={300}
+                    height={300}
+                  />
+                </div>
+                <div slot="full-screen">
+                  <Image src={img()} alt="Additional project image" />
+                </div>
+              </FullScreenable>
             </div>
-            <div slot="full-screen">
-              <Image src={img()} alt="Additional project image" />
-            </div>
-          </FullScreenable>
-        </div>
-      ))
-    }
-  </MasonryImageGrid>
+          ))
+        }
+      </MasonryImageGrid>
+    </div>
   </div>
 </Layout>
 
 <style>
+  :global(.prose p) {
+    margin: 0;
+  }
+
+  /* :global(.prose img) {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  } */
+
   .image-grid {
     display: grid;
     grid-template-rows: 1;
