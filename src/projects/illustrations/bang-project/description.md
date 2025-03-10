@@ -1,5 +1,5 @@
 ---
-title: Bang in het donker
+title: Bang in het donker (Afraid of the dark)
 year: 2023
 ---
 
