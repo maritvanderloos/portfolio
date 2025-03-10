@@ -1,5 +1,5 @@
 ---
-title: Fibre Art
+title: Textile Art
 year: 2025
 order: 6
 ---

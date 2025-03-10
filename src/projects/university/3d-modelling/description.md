@@ -4,7 +4,7 @@ year: 2024
 order: 3
 ---
 In a course on interactive visualization, I learned how to use Blender and Unity software for 3D modeling, animation and integrating 3D assets into a game engine.
-
+<br>
 For my first project, I made a Japanese house in Blender. I modeled, UV mapped and textured every component of the house. Afterward, I exported the model to Unity, where I designed a terrain of mountains and plants around my house. I also integrated a character controller, added animations, and ultimately published the game online. You can play it through the following link: https://maritvdloos.itch.io/japanse-house-game-marit
 <Images images="1jap.png,cover.png,jap3.png" height="500px" width="500px" lgColumns="3" caption= "Details of my Japanese house">
 
