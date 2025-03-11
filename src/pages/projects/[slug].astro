@@ -96,38 +96,49 @@ function parseIntoSections(html: string): Section[] {
 
   try {
     const elementsToParse = ["single-image", "images"];
-    html.split("\n").forEach((line) => {
-      if (!line.trim()) {
-        return;
+    let currentHtmlSection = "";
+
+    const pushAndResetCurrentHtmlSection = () => {
+      if (currentHtmlSection.trim()) {
+        console.log(">>> Pushing html section", currentHtmlSection);
+        sections.push({
+          type: "html",
+          html: currentHtmlSection.trim(),
+        });
       }
+      currentHtmlSection = "";
+    };
+
+    html.split("\n").forEach((line) => {
+      console.log(">>> Processing line", line);
+      // if (!line.trim()) {
+      //   return;
+      // }
       if (
         !elementsToParse.some((element) =>
           line.trim().toLowerCase().startsWith(`<${element}`.toLowerCase())
         )
       ) {
-        console.log("Pushing html section", line);
-        sections.push({
-          type: "html",
-          html: line,
-        });
+        console.log(">>> Pushing html section");
+
+        currentHtmlSection += line + "\n";
         return;
       }
+
       const root = parse(line);
       const childNodes = [...root.childNodes];
 
-      let currentHtmlSection = "";
-
       for (let i = 0; i < childNodes.length; i++) {
         const node = childNodes[i];
-        console.log("Processing node", node, node.nodeType);
+        // console.log("Processing node", node, node.nodeType);
         if (
           node.nodeType === 1 &&
           (node as HTMLElement).tagName === "SINGLE-IMAGE"
         ) {
           // If we have accumulated HTML content, add it as an HTML section
-          // if (currentHtmlSection.trim()) {
-            sections.push({
-              type: "single-image",
+          pushAndResetCurrentHtmlSection();
+          sections.push({
+            type: "single-image",
               // src: (node as HTMLElement).getAttribute("src") || "",
               src: getAndDisplaceProjectImage(
                 (node as HTMLElement).getAttribute("src") || ""
@@ -142,12 +153,9 @@ function parseIntoSections(html: string): Section[] {
               caption: (node as HTMLElement).getAttribute("caption") || "",
               marginY: (node as HTMLElement).getAttribute("marginY") || "1rem",
             });
-            return;
+            // return;
           // }
-        }
-
-        // Check if this is an Images tag
-        if (node.nodeType === 1 && (node as HTMLElement).tagName === "IMAGES") {
+        } else if (node.nodeType === 1 && (node as HTMLElement).tagName === "IMAGES") {
           // If we have accumulated HTML content, add it as an HTML section
           // if (currentHtmlSection.trim()) {
           //   sections.push({
@@ -156,6 +164,7 @@ function parseIntoSections(html: string): Section[] {
           //   });
           //   currentHtmlSection = "";
           // }
+          pushAndResetCurrentHtmlSection();
 
           try {
             // Extract attributes from the Images tag
@@ -195,17 +204,13 @@ function parseIntoSections(html: string): Section[] {
         } else {
           // For other nodes, accumulate HTML content
           currentHtmlSection += node.toString();
+          console.log(">>> Accumulating html section", currentHtmlSection);
         }
       }
 
-      // Add any remaining HTML content
-      if (currentHtmlSection.trim()) {
-        sections.push({
-          type: "html",
-          html: currentHtmlSection.trim(),
-        });
-      }
     });
+    // Add any remaining HTML content
+    pushAndResetCurrentHtmlSection();
   } catch (error) {
     console.error("Error parsing HTML:", error);
     // Fallback: return the entire HTML as a single section
@@ -246,7 +251,7 @@ console.log("PARSED SECTIONS", parsedSections);
                       height={parseInt(section.height) || 300}
                       style={`max-width: ${section.maxWidth}; max-height: ${section.maxHeight}; margin-top: ${section.marginY || '1rem'}; margin-bottom: ${section.marginY || '1rem'};`}
                     />
-                    {section.caption && <div class="text-sm text-gray-500 -mt-2 mb-12 text-left font-sans font-light italic">{section.caption}</div>}
+                    {section.caption && <div class="text-sm text-gray-500 -mt-2 mb-6 text-left font-sans font-light italic">{section.caption}</div>}
                   </div>
                   <div slot="full-screen">
                     <Image src={section.src()} alt={section.alt} />
@@ -284,14 +289,14 @@ console.log("PARSED SECTIONS", parsedSections);
               </div>
               <>{section.caption && 
                 <div style={`margin-top: calc(${section.marginY || '1rem'} * -1);`}>
-                  <div class="text-sm text-gray-500 mt-2 mb-12 text-left font-sans font-light italic">{section.caption}</div>
+                  <div class="text-sm text-gray-500 mt-2 mb-6 text-left font-sans font-light italic">{section.caption}</div>
                 </div>}
               </>
             );
         }
       })
     }
-    <div class="w-full h-full mt-10">
+    <div class="w-full h-full">
       <MasonryImageGrid>
         {
           imagesToShow.map((img) => (

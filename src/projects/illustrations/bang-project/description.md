@@ -21,7 +21,6 @@ Die zich als ik slaap op de bank vlijt
 
 En die alleen mannen bijt
 ```
-
 English translation of the text:
 
 ```

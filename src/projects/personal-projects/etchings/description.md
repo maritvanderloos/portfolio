@@ -7,7 +7,20 @@ Etching is a traditional technique that uses copper to make prints. It involves 
 
 <Images images="1ets.jpg,2ets.jpg,cover.jpg" height="500px" width="500px" lgColumns="3">
 
-<div style="display:flex;flex-wrap:none;">
-    <single-image src="single_cat.jpg" height="3000" width="1000">
-    <single-image src="duo_cats.jpg" height="3000" width="1000">
-</div>
+<single-image src="single_cat.jpg" height="3000" width="1000">
+<single-image src="duo_cats.jpg" height="3000" width="1000">
+
+<style>
+    #section-2, #section-3 {
+        margin-top: -1rem;
+        display: inline-block;
+    }
+
+    #section-2{
+        width: 66%;
+    }
+    #section-3{
+        width: 32%;
+        margin-left: .95rem;
+    }
+</style>

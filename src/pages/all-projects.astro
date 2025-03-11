@@ -1,0 +1,39 @@
+---
+import "../styles/global.css";
+import { projectData } from "../lib/getProjects";
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+
+const projects = await projectData;
+---
+
+<Layout>
+
+  <div class="columns-1 md:columns-2 lg:columns-3 gap-8 max-w-screen-lg">
+    {
+      projects.map((project) => (
+        <div class="break-inside-avoid mb-4">
+          <a
+            href={`/projects/${project.slug}`}
+            class="text-decoration-none text-inherit"
+          >
+            <div class="mb-2">
+              <Image
+                src={project.covers[0]?.() || "https://placecats.com/300/200"}
+                alt={project.title}
+                width={300}
+                height={300}
+                class="w-full h-auto"
+              />
+            </div>
+
+            <div class="flex flex-col">
+              <p class="text-lg text-gray-800">{project.title}</p>
+              <p class="text-sm text-gray-400">{project.year}</p>
+            </div>
+          </a>
+        </div>
+      ))
+    }
+  </div>
+</Layout>
