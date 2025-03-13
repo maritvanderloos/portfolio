@@ -65,7 +65,8 @@ type Section =
       caption?: string;
     }
   | {
-      type: "single-image";
+      type: "single-image" | "img";
+      id?: string;
       src: () => Promise<{ default: ImageMetadata }>;
       height: string;
       maxHeight: string;
@@ -74,8 +75,7 @@ type Section =
       alt: string;
       marginY?: string;
       caption?: string;
-    };
-
+    }
 function getAndDisplaceProjectImage(...imageNames: string[]) {
   const images = project.images.filter((img) => {
     const imgFileName = img.name.split("/").pop()!;
@@ -95,7 +95,7 @@ function parseIntoSections(html: string): Section[] {
   const sections: Section[] = [];
 
   try {
-    const elementsToParse = ["single-image", "images"];
+    const elementsToParse = ["single-image", "images", "img"];
     let currentHtmlSection = "";
 
     const pushAndResetCurrentHtmlSection = () => {
@@ -133,16 +133,23 @@ function parseIntoSections(html: string): Section[] {
         // console.log("Processing node", node, node.nodeType);
         if (
           node.nodeType === 1 &&
-          (node as HTMLElement).tagName === "SINGLE-IMAGE"
+          ((node as HTMLElement).tagName === "SINGLE-IMAGE" || (node as HTMLElement).tagName === "IMG")
         ) {
           // If we have accumulated HTML content, add it as an HTML section
           pushAndResetCurrentHtmlSection();
+          const type = (node as HTMLElement).tagName === "SINGLE-IMAGE" ? "single-image" : "img";
+          console.log("TYPE :: ", type)
+          const src = getAndDisplaceProjectImage(
+            (node as HTMLElement).getAttribute("src") || ""
+          )[0];
+          if (typeof src !== "function") {
+            console.error(`Invalid image source. Failed while parsing project ${project.title} [${project.slug}]. Check the description.md for ${project.slug}`)
+          }
+
           sections.push({
-            type: "single-image",
-              // src: (node as HTMLElement).getAttribute("src") || "",
-              src: getAndDisplaceProjectImage(
-                (node as HTMLElement).getAttribute("src") || ""
-              )[0],
+             type,
+              id: (node as HTMLElement).getAttribute("id") || undefined,
+              src: src,
               maxWidth:
                 (node as HTMLElement).getAttribute("max-width") || "100%",
               maxHeight:
@@ -224,7 +231,7 @@ function parseIntoSections(html: string): Section[] {
 }
 
 const parsedSections = parseIntoSections(processedHtml);
-console.log("PARSED SECTIONS", parsedSections);
+// console.log("PARSED SECTIONS", parsedSections);
 ---
 
 <Layout>
@@ -239,9 +246,23 @@ console.log("PARSED SECTIONS", parsedSections);
         switch (section.type) {
           case "html":
             return <div set:html={section.html} id={`section-${index}`} data-type="html" />;
+          case "img":
+            return (
+              <div id={section.id || `section-${index}`} class="relative" data-type="img" >
+                  <Image
+                    loading="eager"
+                    src={section.src()}
+                    alt={section.alt}
+                    width={parseInt(section.width) || 300}
+                    height={parseInt(section.height) || 300}
+                    style={`max-width: ${section.maxWidth}; max-height: ${section.maxHeight}; margin-top: ${section.marginY || '1rem'}; margin-bottom: ${section.marginY || '1rem'};`}
+                  />
+                  {section.caption && <div class="text-sm text-gray-500 -mt-2 mb-6 text-left font-sans font-light italic">{section.caption}</div>}
+              </div>
+            );
           case "single-image":
             return (
-              <div id={`section-${index}`} class="relative" data-type="single-image">
+              <div id={section.id || `section-${index}`} class="relative" data-type="single-image">
                 <FullScreenable src={section.src()} client:load>
                   <div slot="image">
                     <Image
