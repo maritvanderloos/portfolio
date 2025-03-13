@@ -14,7 +14,7 @@ import me from "../../public/me.jpeg";
         class="object-cover w-full h-auto max-h-[800px]"
       />
     </div>
-    <div class="prose md:col-span-2 order-1 md:order-2">
+    <div class="prose md:col-span-2 order-1 md:order-2 flex flex-col justify-between">
       <p>
         I am Marit van der Loos, a Creative Technology student based in Utrecht.
         In my studies at the University of Twente, I explore innovative ways to
@@ -39,11 +39,26 @@ import me from "../../public/me.jpeg";
         on this website!
       </p>
 
-
       <p class="mt-12 text-right text-sm">
         <span class="text-gray-400"> You can contact me at </span><br />
         <span class="">vdlmarit(at)gmail(dot)com</span>
       </p>
+    </div>
+  </div>
+  <div class="h-96 grid grid-cols-10 gap-6 mt-32 mb-32">
+    <div class="col-span-7">
+      <video
+        src="/public/knitting.mov"
+        class="h-full object-cover"
+        autoplay
+        loop
+        muted
+      playsinline
+      >
+      </video>
+    </div>
+    <div class="col-span-3">
+      <img src="/hihi.jpeg" alt="Its me" class="h-full object-cover">
     </div>
   </div>
 </Layout>
