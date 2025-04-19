@@ -1,7 +1,7 @@
 ---
 title: The Blurred Line
 year: 2025
-order: 7
+order: 0
 ---
 This projects explores the design of an interactive art installation that incorporates but at the same time questions artificial intelligence. The main concept invites participants to call a phone operator with a retro rotary phone. With the help of a booklet with instructions, participants dial a number and ask the phone operator three questions about the history of AI. After each of their questions, the operator tells the participant the right answer.  Initially, participants will not know if they are speaking with another person or an automated assistant. 
 <Images images="intro.jpeg,topic12copy.jpeg" height="400px" width="400px" lgColumns="2"/>
