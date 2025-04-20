@@ -8,5 +8,6 @@ I developed a paper-airplane game in Processing, a Java-based language designed 
 <single-image src="_cover.png" height="3000" width="1000">
 
 The paper plane flies through a landscape featuring a looping background, along with randomly placed and sized trees and flowers. A flock of birds flies around the paper plane and follows it. To create a relaxing experience for players, I chose a minimal design with soft pastel colors. I drew all the images by hand and then scanned them digitally to create the game's visuals.
+<single-image src="sketchcopy.png" height="200" width="300" caption="Drawings">
 
-<single-image src="_sketches.png" height="3000" width="1000">
+
