@@ -14,3 +14,4 @@ The inspiration for this project stems from research that I conducted in prepara
 <br>
 <br> 
 In order to use it as a speaker and microphone, the rotary phone is modified to incorporate these components. I connected an Arduino to the rotary dial of the phone to sense which numbers are dialed. I made the phone booth out of wood and painted it with acrylic paint. I designed the logo and bound the booklet myself. 
+<Images images="1logo.png,wholefront.jpeg,wholeside.jpeg" height="400px" width="400px" lgColumns="3"/>
